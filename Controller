@@ -304,6 +304,13 @@ public class Controller implements KeyListener, ActionListener
 
        // Decrement lives
        lives--;
+       
+       // Set all movement variables back to false
+       isTurningLeft = false;
+       isTurningRight = false;
+       isAccelerating = false;
+       isFiring = false;
+       isFlickering = false;
 
        // Since the ship was destroyed, schedule a transition
        shipdeath = true;
@@ -347,17 +354,17 @@ public class Controller implements KeyListener, ActionListener
        // Time to refresh the screen and deal with keyboard input
        else if (e.getSource() == refreshTimer)
        {
-           if (isTurningRight)
+           if (ship != null && isTurningRight)
            {
                ship.turnRight();
            }
 
-           if (isTurningLeft)
+           if (ship != null && isTurningLeft)
            {
                ship.turnLeft();
            }
 
-           if (isAccelerating && ship.getSpeed() != SPEED_LIMIT)
+           if (ship != null && isAccelerating && ship.getSpeed() != SPEED_LIMIT)
            {
                toggleFlickering();
                ship.accelerate();
