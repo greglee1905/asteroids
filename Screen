@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.geom.Path2D;
 import java.util.Iterator;
 import javax.swing.*;
+import asteroids.participants.LifeShip;
 import asteroids.participants.Ship;
 
 /**
@@ -15,17 +16,15 @@ public class Screen extends JPanel
 {
     /** Legend that is displayed across the screen */
     private String legend;
-    
+
     /** Level on Screen */
     private String level;
-    
-    /** Score on Screen*/
+
+    /** Score on Screen */
     private String score;
-    
 
     /** Game controller */
     private Controller controller;
-    
 
     /**
      * Creates an empty screen
@@ -49,7 +48,6 @@ public class Screen extends JPanel
     {
         this.legend = legend;
     }
-    
 
     /**
      * Paint the participants onto this panel
@@ -75,78 +73,78 @@ public class Screen extends JPanel
         // Draw the legend across the middle of the panel
         int size = g.getFontMetrics().stringWidth(legend);
         g.drawString(legend, (SIZE - size) / 2, SIZE / 2);
-        
+
         // Draw the score
         if (controller.getScore() == -100)
         {
-        g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20)); 
-        g.drawString("", LABEL_HORIZONTAL_OFFSET,LABEL_VERTICAL_OFFSET);
+            g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
+            g.drawString("", LABEL_HORIZONTAL_OFFSET, LABEL_VERTICAL_OFFSET);
         }
-        
-        else 
+
+        else
         {
-            g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20)); 
-            g.drawString(Integer.toString(controller.getScore()), LABEL_HORIZONTAL_OFFSET,LABEL_VERTICAL_OFFSET);
+            g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
+            g.drawString(Integer.toString(controller.getScore()), LABEL_HORIZONTAL_OFFSET, LABEL_VERTICAL_OFFSET);
         }
-        
+
         // Draw the level
         if (controller.getLevel() == -100)
         {
-        g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20)); 
-        g.drawString("", 750-LABEL_HORIZONTAL_OFFSET, LABEL_VERTICAL_OFFSET );
+            g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
+            g.drawString("", 750 - LABEL_HORIZONTAL_OFFSET, LABEL_VERTICAL_OFFSET);
         }
-        
+
         else
         {
-            g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20)); 
-            g.drawString(Integer.toString(controller.getLevel()), 750-LABEL_HORIZONTAL_OFFSET, LABEL_VERTICAL_OFFSET ); 
+            g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
+            g.drawString(Integer.toString(controller.getLevel()), 750 - LABEL_HORIZONTAL_OFFSET, LABEL_VERTICAL_OFFSET);
         }
-        
+
         // Draw the Ships:
         if (controller.getLives() == 3)
         {
-        Ship ship1 = new Ship(200,200,-Math.PI / 2, controller); 
-        ship1.setPosition(50,60);
-        ship1.move();
-        ship1.draw(g);
-        
-        Ship ship2 = new Ship(200,200,-Math.PI / 2, controller); 
-        ship2.setPosition(50 + SHIP_SEPARATION * 5,60);
-        ship2.move();
-        ship2.draw(g);
-        
-        Ship ship3 = new Ship(200,200,-Math.PI / 2, controller); 
-        ship3.setPosition(50 + SHIP_SEPARATION * 5 + SHIP_SEPARATION * 5,60);
-        ship3.move();
-        ship3.draw(g);
+            LifeShip ship1 = new LifeShip(200, 200, -Math.PI / 2, controller);
+            ship1.setPosition(50, 60);
+            ship1.move();
+            ship1.draw(g);
+
+            LifeShip ship2 = new LifeShip(200, 200, -Math.PI / 2, controller);
+            ship2.setPosition(50 + SHIP_SEPARATION * 5, 60);
+            ship2.move();
+            ship2.draw(g);
+
+            LifeShip ship3 = new LifeShip(200, 200, -Math.PI / 2, controller);
+            ship3.setPosition(50 + SHIP_SEPARATION * 5 + SHIP_SEPARATION * 5, 60);
+            ship3.move();
+            ship3.draw(g);
         }
-        
+
         // Need to adjust so these re-center everytime
         if (controller.getLives() == 2)
         {
-        Ship ship1 = new Ship(200,200,-Math.PI / 2, controller); 
-        ship1.setPosition(50,60);
-        ship1.move();
-        ship1.draw(g);
-        
-        Ship ship2 = new Ship(200,200,-Math.PI / 2, controller); 
-        ship2.setPosition(50 + SHIP_SEPARATION * 5,60);
-        ship2.move();
-        ship2.draw(g);
+            LifeShip ship1 = new LifeShip(200, 200, -Math.PI / 2, controller);
+            ship1.setPosition(50, 60);
+            ship1.move();
+            ship1.draw(g);
+
+            LifeShip ship2 = new LifeShip(200, 200, -Math.PI / 2, controller);
+            ship2.setPosition(50 + SHIP_SEPARATION * 5, 60);
+            ship2.move();
+            ship2.draw(g);
         }
-        
+
         if (controller.getLives() == 1)
         {
-        Ship ship1 = new Ship(200,200,-Math.PI / 2, controller); 
-        ship1.setPosition(50,60);
-        ship1.move();
-        ship1.draw(g);
+            LifeShip ship1 = new LifeShip(200, 200, -Math.PI / 2, controller);
+            ship1.setPosition(50, 60);
+            ship1.move();
+            ship1.draw(g);
         }
-        
-        if (controller.getLives()==0)
-         {
-            
-         }
+
+        if (controller.getLives() == 0)
+        {
+
+        }
 
     }
 }
