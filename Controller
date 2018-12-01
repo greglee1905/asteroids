@@ -58,7 +58,21 @@ public class Controller implements KeyListener, ActionListener
     * Is the ship Firing
     */
    private boolean isFiring;
-
+   
+   /**
+    * Level of the game
+    */
+   private int level;
+   
+   /**
+    * Score of the game
+    */
+   private int score;
+   
+   /**
+    * A ship has died
+    */
+   private boolean shipdeath;
 
    /**
     * Constructs a controller to coordinate the game and screen
@@ -95,17 +109,51 @@ public class Controller implements KeyListener, ActionListener
    {
        return lives;
    }
+   
+   public int getLevel()
+   {
+       return level;
+   }
+   
+   public int getScore()
+   {
+       return score;
+   }
+   
+/* May be Unneccessary
+ * 
 
-   /**
-    * Configures the game screen to display the splash screen (STARTS PROGRAM)
-    */
+   public boolean getShipDeath()
+   {
+       return shipdeath;
+   }
+   
+   public boolean switchShipDeath()
+   {
+       if (shipdeath == true)
+       {
+       shipdeath = false;
+       return shipdeath;
+       }
+       
+       else
+       {
+           shipdeath =false;
+           return shipdeath;
+       }
+   }
+*/
+   
+/** 
+ * Startup Screen
+ */
    private void splashScreen ()
    {
         // Clear the screen, reset the level, and display the legend
         clear();
         display.setLegend("Asteroids");
-        display.setLevel("");
-        display.setScore("");
+        level = -100;
+        score = -100;
 
         // Place four asteroids near the corners of the screen.
         placeAsteroids();
@@ -157,8 +205,7 @@ public class Controller implements KeyListener, ActionListener
    }
    
    /**
-    * Places an asteroid near one corner of the screen. Gives it a random velocity and rotation. 
-    * GL Note: Set 4 total with one in each corner. Checked size and type for asteroid. Good.
+    * Adds one singular asteroid
     */
    public void placeAsteroid (int variety, int size, double x, double y, int speed, Controller controller)
    {
@@ -207,8 +254,8 @@ public class Controller implements KeyListener, ActionListener
        display.addKeyListener(this);
 
        // Display components on screen components
-       display.setScore(Integer.toString(0));
-       display.setLevel(Integer.toString(0));
+       level = 1;
+       score = 0;
 
        // Give focus to the game screen
        display.requestFocusInWindow();
@@ -231,12 +278,13 @@ public class Controller implements KeyListener, ActionListener
        ship = null;
 
        // Display a legend
-       display.setLegend("Ship Destroyed");
+       //display.setLegend("Ship Destroyed");
 
        // Decrement lives
        lives--;
 
        // Since the ship was destroyed, schedule a transition
+       shipdeath = true;
        scheduleTransition(END_DELAY);
    }
 
@@ -328,10 +376,84 @@ public class Controller implements KeyListener, ActionListener
        {
            // Clear the transition time
            transitionTime = Long.MAX_VALUE;
+           
+           if (lives>0 && shipdeath == true)
+           {
+           placeShip();
+           }
 
+           //Changing the level values
+           if (this.getLevel() == 2 && shipdeath == false) {
+               placeShip();
+               this.placeAsteroids();
+               
+               //Placing two Additional Asteroids
+               int placeholder = RANDOM.nextInt(3);
+               int placeholder2 = RANDOM.nextInt(3);
+               if (placeholder == 0)
+               {
+                   addParticipant(new Asteroid(1, 2, EDGE_OFFSET+450, EDGE_OFFSET, 3, this));
+               }
+               if (placeholder == 1)
+               {
+                   addParticipant(new Asteroid(2, 2, EDGE_OFFSET, EDGE_OFFSET+450, 3, this));
+               }
+               if (placeholder == 2)
+               {
+                   addParticipant(new Asteroid(3, 2, EDGE_OFFSET+450, EDGE_OFFSET+450, 3, this));
+               }
+               if (placeholder == 3)
+               {
+                   addParticipant(new Asteroid(0, 2, EDGE_OFFSET, EDGE_OFFSET, 3, this));
+               }
+               
+               if (placeholder2 == 0)
+               {
+                   addParticipant(new Asteroid(1, 2, EDGE_OFFSET+450, EDGE_OFFSET, 3, this));
+               }
+               if (placeholder2 == 1)
+               {
+                   addParticipant(new Asteroid(2, 2, EDGE_OFFSET, EDGE_OFFSET+450, 3, this));
+               }
+               if (placeholder2 == 2)
+               {
+                   addParticipant(new Asteroid(3, 2, EDGE_OFFSET+450, EDGE_OFFSET+450, 3, this));
+               }
+               if (placeholder2 == 3)
+               {
+                   addParticipant(new Asteroid(0, 2, EDGE_OFFSET, EDGE_OFFSET, 3, this));
+               }
+
+               level = 3;   
+           }
+           //New Asteroid placed
+           if (this.getLevel() == 1 && shipdeath == false) {
+               placeShip();
+               this.placeAsteroids();
+               
+               int placeholder = RANDOM.nextInt(3);
+               if (placeholder == 0)
+               {
+                   addParticipant(new Asteroid(1, 2, EDGE_OFFSET+450, EDGE_OFFSET, 3, this));
+               }
+               if (placeholder == 1)
+               {
+                   addParticipant(new Asteroid(2, 2, EDGE_OFFSET, EDGE_OFFSET+450, 3, this));
+               }
+               if (placeholder == 2)
+               {
+                   addParticipant(new Asteroid(3, 2, EDGE_OFFSET+450, EDGE_OFFSET+450, 3, this));
+               }
+               if (placeholder == 3)
+               {
+                   addParticipant(new Asteroid(0, 2, EDGE_OFFSET, EDGE_OFFSET, 3, this));
+               }
+               level = 2;   
+           }
+           
            // If there are no lives left, the game is over. Show the final
            // screen.
-           if (lives <= 0)
+           if (lives <= 0 && shipdeath ==true)
            {
                finalScreen();
            }
