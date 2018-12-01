@@ -1,7 +1,5 @@
 package asteroids.game;
 
-endo
-
 import static asteroids.game.Constants.*;
 import java.awt.event.*;
 import java.util.Iterator;
