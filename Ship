@@ -161,8 +161,12 @@ public class Ship extends Participant implements AsteroidDestroyer
     {
         if (p instanceof ShipDestroyer)
         {
+            
             // Expire the ship from the game
-            Participant.expire(this);
+            Participant.expire(this);  
+            controller.placeShipDustLong(this.getX(),this.getY(), RANDOM.nextInt(8), controller);
+            controller.placeShipDustLong(this.getX(),this.getY(), RANDOM.nextInt(8), controller);
+            controller.placeShipDustShort(this.getX(),this.getY(), RANDOM.nextInt(8), controller);
 
             // Tell the controller the ship was destroyed
             controller.shipDestroyed();
@@ -184,3 +188,4 @@ public class Ship extends Participant implements AsteroidDestroyer
         }
     }
 }
+
