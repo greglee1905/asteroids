@@ -1,0 +1,70 @@
+package asteroids.participants;
+
+import static asteroids.game.Constants.*;
+import java.awt.Shape;
+import java.awt.geom.Path2D;
+import asteroids.game.Controller;
+import asteroids.game.Participant;
+import asteroids.game.ParticipantCountdownTimer;
+
+public class ShipDustLong extends Participant 
+{
+    /** The outline of the Dust */
+    private Shape outline;
+
+    /** Game controller */
+    private Controller controller;
+
+    public ShipDustLong (double x, double y, double direction, Controller controller)
+    {
+        new ParticipantCountdownTimer(this,2000); //Possibly change value of timer
+        this.controller = controller;
+        setPosition(x, y);
+        setSpeed(1);
+        setDirection(direction);
+        setRotation(RANDOM.nextInt(8));
+        
+        Path2D.Double poly = new Path2D.Double();
+        poly.moveTo(0, 0);
+        poly.lineTo(0, 0);
+        poly.lineTo(0, 21);
+        poly.closePath();
+        outline = poly;
+        this.move();
+    }
+    
+    /**
+     * RB
+     * Expires the bullets when they've traveled their maximum distance
+     */
+    @Override
+    public void countdownComplete (Object payload)
+    {
+        Participant.expire(this);
+    }
+
+    @Override
+    protected Shape getOutline ()
+    {
+        return outline;
+    }
+    
+    /**
+     * Customizes the base move method by imposing friction
+     */
+    @Override
+    public void move ()
+    {
+        this.setSpeed(1);
+        super.move();
+    }
+
+    //Nothing happens if these collide with anything
+    @Override
+    public void collidedWith (Participant p)
+    {
+        
+    }
+
+
+}
