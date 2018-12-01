@@ -359,6 +359,7 @@ public class Controller implements KeyListener, ActionListener
 
            if (isAccelerating && ship.getSpeed() != SPEED_LIMIT)
            {
+               toggleFlickering();
                ship.accelerate();
                // Error here since the ship is still trying to accelerate when getting hit by the asteroid
            }
