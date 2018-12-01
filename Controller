@@ -7,6 +7,7 @@ import javax.swing.*;
 import asteroids.participants.Alienship;
 import asteroids.participants.Asteroid;
 import asteroids.participants.Bullet;
+import asteroids.participants.Dust;
 import asteroids.participants.Ship;
 
 /**
@@ -142,29 +143,6 @@ public class Controller implements KeyListener, ActionListener
        score =  score + additions;
    }
    
-/* May be Unneccessary
- * 
-
-   public boolean getShipDeath()
-   {
-       return shipdeath;
-   }
-   
-   public boolean switchShipDeath()
-   {
-       if (shipdeath == true)
-       {
-       shipdeath = false;
-       return shipdeath;
-       }
-       
-       else
-       {
-           shipdeath =false;
-           return shipdeath;
-       }
-   }
-*/
    
 /** 
  * Startup Screen
@@ -232,6 +210,15 @@ public class Controller implements KeyListener, ActionListener
    public void placeAsteroid (int variety, int size, double x, double y, int speed, Controller controller)
    {
        addParticipant(new Asteroid(variety, size, x, y, speed, this));
+
+   }
+   
+    /**
+    * Adds Dust
+    */
+   public void placeDust ( double x, double y, int direction, Controller controller)
+   {
+       addParticipant(new Dust(x, y, direction, this));
 
    }
 
