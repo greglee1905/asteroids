@@ -220,6 +220,15 @@ public class Controller implements KeyListener, ActionListener
        addParticipant(new Dust(x, y, direction, this));
 
    }
+   
+      /**
+   * Adds Long Ship Pieces
+   */
+  public void placeShipDustLong ( double x, double y, int direction, Controller controller)
+  {
+      addParticipant(new ShipDustLong(x, y, direction, this));
+
+  }
 
    /**
     * finds place to shoot the bullet
