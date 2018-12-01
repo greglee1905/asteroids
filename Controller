@@ -9,6 +9,8 @@ import asteroids.participants.Asteroid;
 import asteroids.participants.Bullet;
 import asteroids.participants.Dust;
 import asteroids.participants.Ship;
+import asteroids.participants.ShipDustLong;
+import asteroids.participants.ShipDustShort;
 
 /**
 * Controls a game of Asteroids.
@@ -221,13 +223,21 @@ public class Controller implements KeyListener, ActionListener
 
    }
    
-      /**
+   /**
    * Adds Long Ship Pieces
    */
   public void placeShipDustLong ( double x, double y, int direction, Controller controller)
   {
       addParticipant(new ShipDustLong(x, y, direction, this));
 
+  }
+  
+  /**
+   * Adds Long Ship Pieces
+   */
+  public void placeShipDustShort (double x, double y, int direction, Controller controller)
+  {
+      addParticipant(new ShipDustShort(x, y, direction, this));
   }
 
    /**
