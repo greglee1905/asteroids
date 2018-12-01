@@ -598,6 +598,10 @@ public class Controller implements KeyListener, ActionListener
        }
    }
        
+   public boolean getIsAccelerating()
+   {
+       return isAccelerating;
+   }
    
    public void toggleFlickering()
    {
