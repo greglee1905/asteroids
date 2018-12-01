@@ -157,7 +157,12 @@ public class Asteroid extends Participant implements ShipDestroyer
                 {
                     controller.placeAsteroid(RANDOM.nextInt(3),1,this.getX(),this.getY(),RANDOM.nextInt(2)+MAXIMUM_LARGE_ASTEROID_SPEED,controller);
                     controller.placeAsteroid(RANDOM.nextInt(3),1,this.getX(),this.getY(),RANDOM.nextInt(2)+MAXIMUM_LARGE_ASTEROID_SPEED,controller);
-                    controller.setScore(ASTEROID_SCORE[0]);
+                    controller.setScore(ASTEROID_SCORE[2]);
+                    controller.placeDust(p.getX(),p.getY(), RANDOM.nextInt(8), controller);
+                    controller.placeDust(p.getX(),p.getY(), RANDOM.nextInt(8), controller);
+                    controller.placeDust(p.getX(),p.getY(), RANDOM.nextInt(8), controller);
+                    controller.placeDust(p.getX(),p.getY(), RANDOM.nextInt(8), controller);
+                    
                 }
                 
                 if (this.getSize() ==1)
@@ -165,11 +170,19 @@ public class Asteroid extends Participant implements ShipDestroyer
                     controller.placeAsteroid(RANDOM.nextInt(3),0,this.getX(),this.getY(),RANDOM.nextInt(2)+MAXIMUM_MEDIUM_ASTEROID_SPEED,controller);
                     controller.placeAsteroid(RANDOM.nextInt(3),0,this.getX(),this.getY(),RANDOM.nextInt(2)+MAXIMUM_MEDIUM_ASTEROID_SPEED,controller);
                     controller.setScore(ASTEROID_SCORE[1]);
+                    controller.placeDust(p.getX(),p.getY(), RANDOM.nextInt(8), controller);
+                    controller.placeDust(p.getX(),p.getY(), RANDOM.nextInt(8), controller);
+                    controller.placeDust(p.getX(),p.getY(), RANDOM.nextInt(8), controller);
+                    controller.placeDust(p.getX(),p.getY(), RANDOM.nextInt(8), controller);
                 }
                 
                 if (this.getSize() ==0)
                 {
-                    controller.setScore(ASTEROID_SCORE[2]);
+                    controller.setScore(ASTEROID_SCORE[0]);
+                    controller.placeDust(p.getX(),p.getY(), RANDOM.nextInt(8), controller);
+                    controller.placeDust(p.getX(),p.getY(), RANDOM.nextInt(8), controller);
+                    controller.placeDust(p.getX(),p.getY(), RANDOM.nextInt(8), controller);
+                    controller.placeDust(p.getX(),p.getY(), RANDOM.nextInt(8), controller);
                 }
                 
                 
