@@ -6,12 +6,11 @@ import java.awt.geom.*;
 import asteroids.destroyers.*;
 import asteroids.game.Controller;
 import asteroids.game.Participant;
-import asteroids.game.ParticipantCountdownTimer;
 
 /**
  * Represents ships
  */
-public class Ship extends Participant implements AsteroidDestroyer
+public class Ship extends Participant implements AsteroidDestroyer, AlienShipDestroyer, AlienBulletDestroyer
 {
     /** The outline of the ship */
     private Shape outline;
@@ -44,7 +43,7 @@ public class Ship extends Participant implements AsteroidDestroyer
      */
     public double getXNose ()
     {
-        Point2D.Double point = new Point2D.Double(20, 0);
+        Point2D.Double point = new Point2D.Double(21, 0);
         transformPoint(point);
         return point.getX();
     }
@@ -54,7 +53,7 @@ public class Ship extends Participant implements AsteroidDestroyer
      */
     public double getYNose ()
     {
-        Point2D.Double point = new Point2D.Double(20, 0);
+        Point2D.Double point = new Point2D.Double(21, 0);
         transformPoint(point);
         return point.getY();
     }
@@ -179,13 +178,6 @@ public class Ship extends Participant implements AsteroidDestroyer
     @Override
     public void countdownComplete (Object payload)
     {
-        // Give a burst of acceleration, then schedule another
-        // burst for 200 msecs from now.
-        if (payload.equals("move"))
-        {
-            accelerate();
-            new ParticipantCountdownTimer(this, "move", 200);
-        }
     }
 }
 
