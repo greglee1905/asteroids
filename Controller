@@ -631,6 +631,10 @@ public class Controller implements KeyListener, ActionListener
             if (this.getLevel() >= 3 )
             {
                 Alienship.expire(alienShip);
+                Alienship.expire(lilAlienShip);
+                AlienBullet.expire(alienbullet);
+                AlienBullet.expire(lilAlienBullet);
+                //also need to expire bullets
                 placeShip();
                 placeAsteroids();
                 lilalienShipDestroyed();
