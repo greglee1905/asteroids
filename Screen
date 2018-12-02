@@ -2,11 +2,9 @@ package asteroids.game;
 
 import static asteroids.game.Constants.*;
 import java.awt.*;
-import java.awt.geom.Path2D;
 import java.util.Iterator;
 import javax.swing.*;
 import asteroids.participants.LifeShip;
-import asteroids.participants.Ship;
 
 /**
  * The area of the display in which the game takes place.
@@ -25,6 +23,16 @@ public class Screen extends JPanel
 
     /** Game controller */
     private Controller controller;
+    
+    /** 
+     * x coordinate of rectangle center
+     */
+    private int x;
+
+    /** 
+     * y coordinate of rectangle center
+     */
+    private int y;
 
     /**
      * Creates an empty screen
@@ -48,6 +56,7 @@ public class Screen extends JPanel
     {
         this.legend = legend;
     }
+    
 
     /**
      * Paint the participants onto this panel
@@ -77,66 +86,91 @@ public class Screen extends JPanel
         // Draw the score
         if (controller.getScore() == -100)
         {
-            g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
+            g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 30));
             g.drawString("", LABEL_HORIZONTAL_OFFSET, LABEL_VERTICAL_OFFSET);
         }
 
         else
         {
-            g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
-            g.drawString(Integer.toString(controller.getScore()), LABEL_HORIZONTAL_OFFSET, LABEL_VERTICAL_OFFSET);
+            Rectangle rect = new Rectangle(LABEL_HORIZONTAL_OFFSET,LABEL_VERTICAL_OFFSET,1,1);
+            Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 30);
+            String text = Integer.toString(controller.getScore());
+            FontMetrics metrics = g.getFontMetrics(font);
+            x = rect.x + (1-metrics.stringWidth(text)) / 2;
+            y = rect.y +(1+metrics.stringWidth(Integer.toString(0)));
+           g.setFont(font);
+            g.drawString(text, x, y);
         }
 
         // Draw the level
         if (controller.getLevel() == -100)
         {
-            g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
+            g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
             g.drawString("", 750 - LABEL_HORIZONTAL_OFFSET, LABEL_VERTICAL_OFFSET);
         }
 
         else
         {
-            g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
-            g.drawString(Integer.toString(controller.getLevel()), 750 - LABEL_HORIZONTAL_OFFSET, LABEL_VERTICAL_OFFSET);
+            Rectangle rect = new Rectangle(750-LABEL_HORIZONTAL_OFFSET,LABEL_VERTICAL_OFFSET,1,1);
+            Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 30);
+            String text = Integer.toString(controller.getLevel());
+            FontMetrics metrics = g.getFontMetrics(font);
+            int x = rect.x + (metrics.stringWidth(text)) / 2;
+            y = rect.y +(1+metrics.stringWidth(Integer.toString(0)));
+           g.setFont(font);
+            g.drawString(text, x, y);
         }
 
         // Draw the Ships:
         if (controller.getLives() == 3)
         {
+            String text = (Integer.toString(controller.getScore()));
+            Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 30);
+            FontMetrics metrics = g.getFontMetrics(font);
+            
             LifeShip ship1 = new LifeShip(200, 200, -Math.PI / 2, controller);
-            ship1.setPosition(50, 60);
+            ship1.setPosition(x -27 + metrics.stringWidth(text)/2  , y+27);
             ship1.move();
             ship1.draw(g);
 
             LifeShip ship2 = new LifeShip(200, 200, -Math.PI / 2, controller);
-            ship2.setPosition(50 + SHIP_SEPARATION * 5, 60);
+            ship2.setPosition(x + metrics.stringWidth(text)/2, y+27);
             ship2.move();
             ship2.draw(g);
 
             LifeShip ship3 = new LifeShip(200, 200, -Math.PI / 2, controller);
-            ship3.setPosition(50 + SHIP_SEPARATION * 5 + SHIP_SEPARATION * 5, 60);
+            ship3.setPosition(x + 27 + metrics.stringWidth(text) /2 , y+27);
             ship3.move();
             ship3.draw(g);
+
         }
 
         // Need to adjust so these re-center everytime
         if (controller.getLives() == 2)
         {
+            String text = (Integer.toString(controller.getScore()));
+            Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 30);
+            FontMetrics metrics = g.getFontMetrics(font);
+            
             LifeShip ship1 = new LifeShip(200, 200, -Math.PI / 2, controller);
-            ship1.setPosition(50, 60);
+            ship1.setPosition(x -13 + metrics.stringWidth(text)/2  , y+27);
             ship1.move();
             ship1.draw(g);
 
             LifeShip ship2 = new LifeShip(200, 200, -Math.PI / 2, controller);
-            ship2.setPosition(50 + SHIP_SEPARATION * 5, 60);
+            ship2.setPosition(x +14+ + metrics.stringWidth(text)/2, y+27);
             ship2.move();
             ship2.draw(g);
         }
 
         if (controller.getLives() == 1)
         {
+            String text = (Integer.toString(controller.getScore()));
+            Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 30);
+            FontMetrics metrics = g.getFontMetrics(font);
+            
             LifeShip ship1 = new LifeShip(200, 200, -Math.PI / 2, controller);
-            ship1.setPosition(50, 60);
+            ship1.setPosition(x + metrics.stringWidth(text)/2  , y+27);
             ship1.move();
             ship1.draw(g);
         }
