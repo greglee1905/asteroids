@@ -1,185 +1,807 @@
-package asteroids.participants;
+package asteroids.game;
 
 import static asteroids.game.Constants.*;
-import java.awt.Shape;
-import java.awt.geom.Path2D;
-import java.awt.geom.Point2D;
-import asteroids.destroyers.AlienShipDestroyer;
-import asteroids.destroyers.AsteroidDestroyer;
-import asteroids.destroyers.ShipDestroyer;
-import asteroids.game.Controller;
-import asteroids.game.Participant;
-import asteroids.game.ParticipantCountdownTimer;
+import java.awt.event.*;
+import java.util.Iterator;
+import javax.swing.*;
+import asteroids.participants.AlienBullet;
+import asteroids.participants.lilAlienShip;
+import asteroids.participants.lilAlienBullet;
+import asteroids.participants.Alienship;
+import asteroids.participants.Asteroid;
+import asteroids.participants.Bullet;
+import asteroids.participants.Dust;
+import asteroids.participants.Ship;
+import asteroids.participants.ShipDustLong;
+import asteroids.participants.ShipDustShort;
 
-public class Alienship extends Participant implements AsteroidDestroyer, ShipDestroyer
+/**
+ * Controls a game of Asteroids.
+ */
+public class Controller implements KeyListener, ActionListener
 {
-    /** The outline of the ship */
-    private Shape outline;
+    /** The state of all the Participants */
+    private ParticipantState pstate;
 
-    /** Game controller */
-    private Controller controller;
-
-    /**
-     * Defines whether the ship is moving left (true) or right (false)
-     */
-    private boolean isMovingLeft;
+    /** The ship (if one is active) or null (otherwise) */
+    private Ship ship;
 
     /**
-     * Constructs a ship at the specified coordinates that is pointed in the given direction.
+     * Bullets if they are active
      */
-    public Alienship (int x, int y, double direction, Controller controller)
+    private Bullet bullet;
+
+    /**
+     * Alien bullets if active
+     */
+    private AlienBullet alienbullet;
+    
+    /**
+     * Alien bullets if active
+     */
+    private AlienBullet lilAlienBullet;
+
+    /**
+     * Alien Ship if active
+     */
+    private Alienship alienShip;
+    
+    /**
+     * Alien Ship if active
+     */
+    private lilAlienShip lilAlienShip;
+
+    /** When this timer goes off, it is time to refresh the animation */
+    private Timer refreshTimer;
+
+    /**
+     * The time at which a transition to a new stage of the game should be made. A transition is scheduled a few seconds
+     * in the future to give the user time to see what has happened before doing something like going to a new level or
+     * resetting the current level.
+     */
+    private long transitionTime;
+
+    /** Number of lives left */
+    private int lives;
+
+    /** The game display */
+    private Display display;
+
+    /**
+     * RB Is the ship turning left?
+     */
+    private boolean isTurningLeft;
+
+    /**
+     * RB Is the ship turning right?
+     */
+    private boolean isTurningRight;
+
+    /**
+     * RB Is the ship accelerating
+     */
+    private boolean isAccelerating;
+
+    /**
+     * Is the ship Firing
+     */
+    private boolean isFiring;
+
+    /**
+     * Level of the game
+     */
+    private int level;
+
+    /**
+     * Score of the game
+     */
+    private int score;
+
+    /**
+     * A ship has died
+     */
+    private boolean shipdeath;
+
+    /**
+     * Is the ship flickering
+     */
+    private boolean isFlickering;
+    
+    /**
+     * Is the AlienShip firing
+     */
+    private boolean alienFiring;
+    
+    /**
+     * Is the AlienShip firing
+     */
+    private boolean lilAlienFiring;
+
+
+    /**
+     * Constructs a controller to coordinate the game and screen
+     */
+    public Controller ()
     {
-        new ParticipantCountdownTimer(this,"Movement", 1000);
-        new ParticipantCountdownTimer(this,"Shooting", (RANDOM.nextInt(3) + 1) * 1000);
-        this.controller = controller;
-        setPosition(x, y);
-        setRotation(direction);
+        // Initialize the ParticipantState
+        pstate = new ParticipantState();
 
-        Path2D.Double poly = new Path2D.Double();
-        poly.moveTo(0, 0);
-        poly.lineTo(19, 0);
-        poly.lineTo(-19, 0);
-        poly.lineTo(-8, -8);
-        poly.lineTo(8, -8);
-        poly.lineTo(19, 0);
-        poly.lineTo(8, 8);
-        poly.lineTo(-8, 8);
-        poly.lineTo(-19, 0);
-        poly.moveTo(-8, -8);
-        poly.lineTo(-6, -16);
-        poly.lineTo(6, -16);
-        poly.lineTo(8, -8);
-        poly.closePath();
-        outline = poly;
+        // Set up the refresh timer.
+        refreshTimer = new Timer(FRAME_INTERVAL, this);
+
+        // Clear the transitionTime
+        transitionTime = Long.MAX_VALUE;
+
+        // Record the display object
+        display = new Display(this);
+
+        // Bring up the splash screen and start the refresh timer
+        splashScreen();
+        display.setVisible(true);
+        refreshTimer.start();
+    }
+
+    /**
+     * Returns the ship, or null if there isn't one
+     */
+    public Ship getShip ()
+    {
+        return ship;
+    }
+
+    /**
+     * Returns the number of lives
+     */
+    public int getLives ()
+    {
+        return lives;
+    }
+
+    /**
+     * Returns the level
+     */
+    public int getLevel ()
+    {
+        return level;
+    }
+
+    /**
+     * Returns the Score
+     */
+    public int getScore ()
+    {
+        return score;
+    }
+
+    /**
+     * Sets the Score
+     */
+    public void setScore (int additions)
+    {
+        score = score + additions;
+    }
+
+    /**
+     * Startup Screen
+     */
+    private void splashScreen ()
+    {
+        // Clear the screen, reset the level, and display the legend
+        clear();
+        display.setLegend("Asteroids");
+        level = -100;
+        score = -100;
+
+        // Place four asteroids near the corners of the screen.
+        placeAsteroids();
+    }
+
+    /**
+     * The game is over. Displays a message to that effect.
+     */
+    private void finalScreen ()
+    {
+        display.setLegend(GAME_OVER);
+        display.removeKeyListener(this);
+    }
+
+    /**
+     * Place a new ship in the center of the screen. Remove any existing ship first.
+     */
+    private void placeShip ()
+    {
+        // Place a new ship
+        Participant.expire(ship);
+        ship = new Ship(SIZE / 2, SIZE / 2, -Math.PI / 2, this);
+        addParticipant(ship);
+        display.setLegend("");
+    }
+
+    /**
+     * Place a new AlienShip in the center of the screen.
+     */
+
+    private void placeAlienship ()
+    {
+        // Generates 0 or 1 randomly
+        int leftOrRight = Math.round(RANDOM.nextFloat());
+
+        // Places ship randomly on y axis at far left of screen
+        if (leftOrRight == 0)
+        {
+           alienShip = new Alienship(0, RANDOM.nextInt(SIZE), 0, this);
+            alienShip.setMovementDirectionLeft(false);
+            alienShip.setVelocity(alienShip.getSpeed(), alienShip.getDirection());
+            addParticipant(alienShip);
+        }
+
+        // Places ship at random y axis at far right of screen.
+        else
+        {
+           alienShip = new Alienship(SIZE, RANDOM.nextInt(SIZE), 0, this);
+            alienShip.setMovementDirectionLeft(true);
+            alienShip.setVelocity(alienShip.getSpeed(), alienShip.getDirection());
+            addParticipant(alienShip);
+
+        }
+        
+    }
+
+    private void placelilAlienShip ()
+    {
+        // Generates 0 or 1 randomly
+        int leftOrRight = Math.round(RANDOM.nextFloat());
+
+        // Places ship randomly on y axis at far left of screen
+        if (leftOrRight == 0)
+        {
+             lilAlienShip = new lilAlienShip(0, RANDOM.nextInt(SIZE), 0, this);
+            lilAlienShip.setMovementDirectionLeft(false);
+            lilAlienShip.setVelocity(lilAlienShip.getSpeed(), lilAlienShip.getDirection());
+            addParticipant(lilAlienShip);
+        }
+
+        // Places ship at random y axis at far right of screen.
+        else
+        {
+            lilAlienShip = new lilAlienShip(SIZE, RANDOM.nextInt(SIZE), 0, this);
+            lilAlienShip.setMovementDirectionLeft(true);
+            lilAlienShip.setVelocity(lilAlienShip.getSpeed(), lilAlienShip.getDirection());
+            addParticipant(lilAlienShip);
+
+        }
+        
+    }
+    /**
+     * Places an asteroid near one corner of the screen. Gives it a random velocity and rotation. GL Note: Set 4 total
+     * with one in each corner. Checked size and type for asteroid. Good.
+     */
+    private void placeAsteroids ()
+    {
+        // Possibly just add random variable here which changes how much offset can happen. Will probably be easiest
+        // way to modulate where the load in
+        addParticipant(new Asteroid(1, 2, EDGE_OFFSET + 500 - RANDOM.nextInt(100),
+                EDGE_OFFSET - 50 + RANDOM.nextInt(100), 3, this));
+        addParticipant(new Asteroid(2, 2, EDGE_OFFSET - 50 + RANDOM.nextInt(100),
+                EDGE_OFFSET + 500 - RANDOM.nextInt(100), 3, this));
+        addParticipant(new Asteroid(3, 2, EDGE_OFFSET + 500 - RANDOM.nextInt(100),
+                EDGE_OFFSET + 500 - RANDOM.nextInt(100), 3, this));
+        addParticipant(new Asteroid(0, 2, EDGE_OFFSET - 50 + RANDOM.nextInt(100),
+                EDGE_OFFSET - 50 + RANDOM.nextInt(100), 3, this));
+    }
+
+    /**
+     * Adds one singular asteroid
+     */
+    public void placeAsteroid (int variety, int size, double x, double y, int speed, Controller controller)
+    {
+        addParticipant(new Asteroid(variety, size, x, y, speed, this));
 
     }
 
     /**
-     * Tells the alien ship to re-adjust its trajectory to +1 radian above center, -1 radian, or stay on course
+     * Adds Dust
+     */
+    public void placeDust (double x, double y, int direction, Controller controller)
+    {
+        addParticipant(new Dust(x, y, direction, this));
+
+    }
+
+    /**
+     * Adds Long Ship Pieces
+     */
+    public void placeShipDustLong (double x, double y, int direction, Controller controller)
+    {
+        addParticipant(new ShipDustLong(x, y, direction, this));
+
+    }
+
+    /**
+     * Adds Long Ship Pieces
+     */
+    public void placeShipDustShort (double x, double y, int direction, Controller controller)
+    {
+        addParticipant(new ShipDustShort(x, y, direction, this));
+    }
+
+    /**
+     * finds place to shoot the bullet
+     */
+
+    private void placeBullet ()
+    {
+        addParticipant(new Bullet(ship.getXNose(), ship.getYNose(), ship.getRotation(), this));
+    }
+
+ 
+    /**
+     * Finds place to shoot the alien bullet.
+     */
+    private void placeAlienBullet ()
+    {
+        addParticipant(new AlienBullet(alienShip.getX(),alienShip.getY(), RANDOM.nextInt(8), this)); 
+        this.setAlienFiring(false);
+    }
+    
+    /**
+     * Finds place to shoot the lilAlienBullet.
+     */
+    private void placelilAlienBullet ()
+    {
+      //This method has many issues. including finding and tracking and dealing with when the ship is nul
+        addParticipant(new lilAlienBullet(lilAlienShip.getX(),lilAlienShip.getY(),Math.atan2(ship.getX(),ship.getY()) + 2.*Math.PI, this)); 
+        this.setlilAlienFiring(false);
+    }
+
+    /**
+     * Clears the screen so that nothing is displayed
+     */
+    private void clear ()
+    {
+        pstate.clear();
+        display.setLegend("");
+        ship = null;
+    }
+
+    /**
+     * Sets things up and begins a new game.
+     */
+    private void initialScreen ()
+    {
+        // Clear the screen
+        clear();
+
+        // Place asteroids
+        //placeAsteroids();
+
+        // Place the ship
+        placeShip();
+
+        //USED FOR TESTING
+        //placeAlienship();
+        placelilAlienShip();
+
+        // Reset statistics
+        lives = 3;
+
+        // Start listening to events (but don't listen twice)
+        display.removeKeyListener(this);
+        display.addKeyListener(this);
+
+        // Display components on screen components
+        level = 1;
+        score = 0;
+
+        // Give focus to the game screen
+        display.requestFocusInWindow();
+    }
+
+    /**
+     * Adds a new Participant
+     */
+    public void addParticipant (Participant p)
+    {
+        pstate.addParticipant(p);
+    }
+
+    /**
+     * The ship has been destroyed
+     */
+    public void shipDestroyed ()
+    {
+        // Null out the ship
+        ship = null;
+
+        // Display a legend
+        // display.setLegend("Ship Destroyed");
+
+        // Decrement lives
+        lives--;
+
+        // Set all movement variables back to false
+        isTurningLeft = false;
+        isTurningRight = false;
+        isAccelerating = false;
+        isFiring = false;
+        isFlickering = false;
+
+        // Since the ship was destroyed, schedule a transition
+        shipdeath = true;
+        scheduleTransition(END_DELAY);
+    }
+
+    /**
+     * An asteroid has been destroyed
+     */
+    public void asteroidDestroyed ()
+    {
+        score = this.getScore();
+
+        if (pstate.countAsteroids() == 0)
+        {
+            scheduleTransition(END_DELAY);
+        }
+    }
+
+    public void bulletDestroyed ()
+    {
+        bullet = null;
+    }
+
+    public void alienBulletDestroyed ()
+    {
+        alienbullet = null;
+    }
+    
+    public void lilalienBulletDestroyed ()
+    {
+        lilAlienBullet = null;
+    }
+
+    /**
+     * Schedules a transition m msecs in the future
+     */
+    private void scheduleTransition (int m)
+    {
+        transitionTime = System.currentTimeMillis() + m;
+    }
+
+    /**
+     * This method will be invoked because of button presses and timer events.
      */
     @Override
-    public void countdownComplete (Object payload)
+    public void actionPerformed (ActionEvent e)
     {
-        if (payload == "Movement")
+        // The start button has been pressed. Stop whatever we're doing
+        // and bring up the initial screen
+        if (e.getSource() instanceof JButton)
         {
-        int upDownOrCenter = RANDOM.nextInt(3);
+            initialScreen();
+        }
 
-        if (isMovingLeft == false)
+        // Time to refresh the screen and deal with keyboard input
+        else if (e.getSource() == refreshTimer)
         {
-            if (upDownOrCenter == 0)
+            if (this.getIsAlienFiring() == true && alienShip != null )
             {
-                this.setDirection(0);
+                    placeAlienBullet();
             }
-            if (upDownOrCenter == 1)
+                
+            if (this.getIslilAlienFiring() == true && lilAlienShip != null && ship != null )
             {
-                this.setDirection(Math.PI / 4);
+                    placelilAlienBullet();
             }
-            if (upDownOrCenter == 2)
-            {
-                this.setDirection(-Math.PI / 4);
-            }
-        }
-        else
-        {
-            if (upDownOrCenter == 0)
-            {
-                this.setDirection(180);
-            }
-            if (upDownOrCenter == 1)
-            {
-                this.setDirection(3 * Math.PI / 4);
-            }
-            if (upDownOrCenter == 2)
-            {
-                this.setDirection(-5 * Math.PI / 4);
-            }
-        }
-        new ParticipantCountdownTimer(this, "Movement", 1000);
-        }
-        
-        if (payload == "Shooting")
-        {
-            controller.setAlienFiring(true);
-            new ParticipantCountdownTimer(this,"Shooting", (RANDOM.nextInt(3) + 1) * 1000);
-
             
-        }
-        
-    }
+            
+            
+            if (ship != null && isTurningRight)
+            {
+                ship.turnRight();
+            }
 
-    @Override
-    protected Shape getOutline ()
-    {
-        return outline;
-    }
-    
-    
-    /**
-     * Returns the x-coordinate of the point on the screen where the alienship's center is located.
-     */
-    public double getXCenter ()
-    {
-        Point2D.Double point = new Point2D.Double(0, 0);
-        transformPoint(point);
-        return point.getX();
-    }
+            if (ship != null && isTurningLeft)
+            {
+                ship.turnLeft();
+            }
 
-    /**
-     * Returns the x-coordinate of the point on the screen where the alienship's center is located.
-     */
-    public double getYCenter ()
-    {
-        Point2D.Double point = new Point2D.Double(0, 0);
-        transformPoint(point);
-        return point.getY();
-    }
+            if (ship != null && isAccelerating && ship.getSpeed() != SPEED_LIMIT)
+            {
+                toggleFlickering();
+                ship.accelerate();
+            }
 
-    /**
-     * Moves
-     */
-    @Override
-    public void move ()
-    {
-        super.move();
-    }
+            if (isFiring && pstate.countBullets() < BULLET_LIMIT)
+            {
+                placeBullet();
+            }
 
-    /**
-     * When an AlienShip collides with a ShipDestroyer, it expires
-     */
-    @Override
-    public void collidedWith (Participant p)
-    {
-        if (p instanceof AlienShipDestroyer)
-        {
+            // It may be time to make a game transition
+            performTransition();
 
-            // Expire the alien ship from the game
-            Participant.expire(this);
+            // Move the participants to their new locations
+            pstate.moveParticipants();
 
-            // Spawn four long ship dusts and 2 short ship dusts.
-            controller.placeShipDustLong(this.getX(), this.getY(), RANDOM.nextInt(8), controller);
-            controller.placeShipDustLong(this.getX(), this.getY(), RANDOM.nextInt(8), controller);
-            controller.placeShipDustLong(this.getX(), this.getY(), RANDOM.nextInt(8), controller);
-            controller.placeShipDustLong(this.getX(), this.getY(), RANDOM.nextInt(8), controller);
-            controller.placeShipDustShort(this.getX(), this.getY(), RANDOM.nextInt(8), controller);
-            controller.placeShipDustShort(this.getX(), this.getY(), RANDOM.nextInt(8), controller);
-            controller.setScore(200);
+            // Refresh screen
+            if (System.currentTimeMillis() % 100 > 1)
+                display.refresh();
         }
     }
 
     /**
-     * Sets to move the ship to the left or to the right permanently.
+     * Returns an iterator over the active participants
      */
-    public boolean setMovementDirectionLeft (boolean choice)
+    public Iterator<Participant> getParticipants ()
     {
-        if (choice)
+        return pstate.getParticipants();
+    }
+
+    /**
+     * If the transition time has been reached, transition to a new state
+     */
+    private void performTransition ()
+    {
+        // Do something only if the time has been reached
+        if (transitionTime <= System.currentTimeMillis())
         {
-            isMovingLeft = true;
-            this.setSpeed(-4);
+            // Clear the transition time
+            transitionTime = Long.MAX_VALUE;
+
+            // Changing the level values
+            //THERE IS ALSO A BUG with if the ship collides into the last boulder on the screen
+            if (this.getLevel() == 2 && shipdeath == false)
+            {
+                placeShip();
+                placelilAlienShip();
+                placeAsteroids();
+
+                // Placing two Additional Asteroids
+                int placeholder = RANDOM.nextInt(3);
+                int placeholder2 = RANDOM.nextInt(3);
+                if (placeholder == 0)
+                {
+                    addParticipant(new Asteroid(1, 2, EDGE_OFFSET + 500 - RANDOM.nextInt(100),
+                            EDGE_OFFSET - 50 + RANDOM.nextInt(100), 3, this));
+                }
+                if (placeholder == 1)
+                {
+                    addParticipant(new Asteroid(2, 2, EDGE_OFFSET - 50 + RANDOM.nextInt(100),
+                            EDGE_OFFSET + 500 - RANDOM.nextInt(100), 3, this));
+                }
+                if (placeholder == 2)
+                {
+                    addParticipant(new Asteroid(3, 2, EDGE_OFFSET + 500 - RANDOM.nextInt(100),
+                            EDGE_OFFSET + 500 - RANDOM.nextInt(100), 3, this));
+                }
+                if (placeholder == 3)
+                {
+                    addParticipant(new Asteroid(0, 2, EDGE_OFFSET - 50 + RANDOM.nextInt(100),
+                            EDGE_OFFSET - 50 + RANDOM.nextInt(100), 3, this));
+                }
+
+                if (placeholder2 == 0)
+                {
+                    addParticipant(new Asteroid(1, 2, EDGE_OFFSET + 500 - RANDOM.nextInt(100),
+                            EDGE_OFFSET - 50 + RANDOM.nextInt(100), 3, this));
+                }
+                if (placeholder2 == 1)
+                {
+                    addParticipant(new Asteroid(2, 2, EDGE_OFFSET - 50 + RANDOM.nextInt(100),
+                            EDGE_OFFSET + 500 - RANDOM.nextInt(100), 3, this));
+                }
+                if (placeholder2 == 2)
+                {
+                    addParticipant(new Asteroid(3, 2, EDGE_OFFSET + 500 - RANDOM.nextInt(100),
+                            EDGE_OFFSET + 500 - RANDOM.nextInt(100), 3, this));
+                }
+                if (placeholder2 == 3)
+                {
+                    addParticipant(new Asteroid(0, 2, EDGE_OFFSET - 50 + RANDOM.nextInt(100),
+                            EDGE_OFFSET - 50 + RANDOM.nextInt(100), 3, this));
+                }
+
+                level = 3;
+            }
+            // New Asteroid placed
+            if (this.getLevel() == 1 && shipdeath == false)
+            {
+                placeAlienship();
+                placeShip();
+                this.placeAsteroids();
+
+                int placeholder = RANDOM.nextInt(3);
+                if (placeholder == 0)
+                {
+                    addParticipant(new Asteroid(1, 2, EDGE_OFFSET + 500 - RANDOM.nextInt(100),
+                            EDGE_OFFSET - 50 + RANDOM.nextInt(100), 3, this));
+                }
+                if (placeholder == 1)
+                {
+                    addParticipant(new Asteroid(2, 2, EDGE_OFFSET - 50 + RANDOM.nextInt(100),
+                            EDGE_OFFSET + 500 - RANDOM.nextInt(100), 3, this));
+                }
+                if (placeholder == 2)
+                {
+                    addParticipant(new Asteroid(3, 2, EDGE_OFFSET + 500 - RANDOM.nextInt(100),
+                            EDGE_OFFSET + 500 - RANDOM.nextInt(100), 3, this));
+                }
+                if (placeholder == 3)
+                {
+                    addParticipant(new Asteroid(0, 2, EDGE_OFFSET - 50 + RANDOM.nextInt(100),
+                            EDGE_OFFSET - 50 + RANDOM.nextInt(100), 3, this));
+                }
+
+                level = 2;
+            }
+
+            if (lives > 0 && shipdeath == true)
+            {
+                placeShip();
+                shipdeath = false;
+            }
+
+            // If there are no lives left, the game is over. Show the final
+            // screen.
+            if (lives <= 0 && shipdeath == true)
+            {
+                finalScreen();
+            }
+
+        }
+    }
+
+    /**
+     * If a key of interest is pressed, record that it is down. GL Edit: Added directions to the flow
+     */
+    @Override
+    public void keyPressed (KeyEvent e)
+    {
+        if (e.getKeyCode() == KeyEvent.VK_RIGHT && ship != null)
+        {
+            isTurningRight = true;
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_D && ship != null)
+        {
+            isTurningRight = true;
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_LEFT && ship != null)
+        {
+            isTurningLeft = true;
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_A && ship != null)
+        {
+            isTurningLeft = true;
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_UP && ship != null)
+        {
+            isAccelerating = true;
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_W && ship != null)
+        {
+            isAccelerating = true;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_DOWN && ship != null)
+        {
+            isFiring = true;
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_S && ship != null)
+        {
+            isFiring = true;
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_SPACE && ship != null)
+        {
+            isFiring = true;
+        }
+    }
+
+    /**
+     * These events are ignored.
+     */
+    @Override
+    public void keyTyped (KeyEvent e)
+    {
+    }
+
+    /**
+     * These events are ignored.
+     */
+    @Override
+    public void keyReleased (KeyEvent e)
+    {
+        if (e.getKeyCode() == KeyEvent.VK_RIGHT && ship != null)
+        {
+            isTurningRight = false;
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_D && ship != null)
+        {
+            isTurningRight = false;
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_LEFT && ship != null)
+        {
+            isTurningLeft = false;
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_A && ship != null)
+        {
+            isTurningLeft = false;
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_UP && ship != null)
+        {
+            isAccelerating = false;
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_W && ship != null)
+        {
+            isAccelerating = false;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_DOWN && ship != null)
+        {
+            isFiring = false;
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_S && ship != null)
+        {
+            isFiring = false;
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_SPACE && ship != null)
+        {
+            isFiring = false;
+        }
+    }
+
+    public boolean getIsAccelerating ()
+    {
+        return isAccelerating;
+    }
+
+    public void toggleFlickering ()
+    {
+        if (isFlickering)
+        {
+            isFlickering = false;
         }
         else
         {
-        this.setSpeed(4);
+            isFlickering = true;
         }
-        return isMovingLeft;
+
+    }
+
+    public boolean getIsFlickering ()
+    {
+        return isFlickering;
+    }
+    
+    public boolean getIsAlienFiring ()
+    {
+        return alienFiring;
+    }
+    
+    public boolean setAlienFiring (boolean alienFire)
+    {
+        alienFiring = alienFire;
+        return alienFiring;
+    }
+    
+    public boolean getIslilAlienFiring ()
+    {
+        return lilAlienFiring;
+    }
+    
+    public boolean setlilAlienFiring (boolean alienFire)
+    {
+        lilAlienFiring = alienFire;
+        return lilAlienFiring;
     }
 }
