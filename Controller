@@ -348,9 +348,18 @@ public class Controller implements KeyListener, ActionListener
      */
     private void placelilAlienBullet ()
     {
-        // This method has many issues. including finding and tracking and dealing with when the ship is nul
-        addParticipant(new lilAlienBullet(lilAlienShip.getX(), lilAlienShip.getY(),
-                Math.atan2(ship.getX(), ship.getY()) + 2. * Math.PI, this));
+        double angle = 0.0;
+        int marker = RANDOM.nextInt(1);
+        if (marker ==0)
+        {
+           angle = Math.atan2(lilAlienShip.getY()-ship.getY(),lilAlienShip.getX()-ship.getX())+ (Math.PI + (RANDOM.nextInt(87)*0.001));
+        }
+        else
+        {
+            angle = Math.atan2(lilAlienShip.getY()-ship.getY(),lilAlienShip.getX()-ship.getX())+ (Math.PI - (RANDOM.nextInt(87)*0.001));   
+        }
+
+        addParticipant(new lilAlienBullet(lilAlienShip.getX(),lilAlienShip.getY(), angle, this)); 
         this.setlilAlienFiring(false);
     }
 
