@@ -29,8 +29,8 @@ public class lilAlienShip extends Participant implements AsteroidDestroyer, Ship
      */
     public lilAlienShip (int x, int y, double direction, Controller controller)
     {
-        new ParticipantCountdownTimer(this,"Movement", 1000);
-        new ParticipantCountdownTimer(this,"Shooting", (RANDOM.nextInt(3) + 1) * 100);//SHOOTS FASTER
+        new ParticipantCountdownTimer(this,"Movement2", 1000);
+        new ParticipantCountdownTimer(this,"Shooting2", (RANDOM.nextInt(3) + 1) * 100);//SHOOTS FASTER
         this.controller = controller;
         setPosition(x, y);
         setRotation(direction);
@@ -60,7 +60,7 @@ public class lilAlienShip extends Participant implements AsteroidDestroyer, Ship
     @Override
     public void countdownComplete (Object payload)
     {
-        if (payload == "Movement")
+        if (payload == "Movement2")
         {
         int upDownOrCenter = RANDOM.nextInt(3);
 
@@ -94,13 +94,13 @@ public class lilAlienShip extends Participant implements AsteroidDestroyer, Ship
                 this.setDirection(-5 * Math.PI / 4);
             }
         }
-        new ParticipantCountdownTimer(this, "Movement", 1000);
+        new ParticipantCountdownTimer(this, "Movement2", 1000);
         }
         
-        if (payload == "Shooting")
+        if (payload == "Shooting2")
         {
-            controller.setAlienFiring(true);
-            new ParticipantCountdownTimer(this,"Shooting", (RANDOM.nextInt(3) + 1) * 1000);
+            controller.setlilAlienFiring(true);
+            new ParticipantCountdownTimer(this,"Shooting2", (RANDOM.nextInt(3) + 1) * 100);
 
             
         }
@@ -162,7 +162,7 @@ public class lilAlienShip extends Participant implements AsteroidDestroyer, Ship
             controller.placeShipDustLong(this.getX(), this.getY(), RANDOM.nextInt(8), controller);
             controller.placeShipDustShort(this.getX(), this.getY(), RANDOM.nextInt(8), controller);
             controller.placeShipDustShort(this.getX(), this.getY(), RANDOM.nextInt(8), controller);
-            controller.setScore(200);
+            controller.setScore(1000);
         }
     }
 
@@ -174,7 +174,7 @@ public class lilAlienShip extends Participant implements AsteroidDestroyer, Ship
         if (choice)
         {
             isMovingLeft = true;
-            this.setSpeed(-4);
+            this.setSpeed(-6);
         }
         else
         {
