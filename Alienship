@@ -29,8 +29,8 @@ public class Alienship extends Participant implements AsteroidDestroyer, ShipDes
      */
     public Alienship (int x, int y, double direction, Controller controller)
     {
-        new ParticipantCountdownTimer(this,"Movement", 1000);
-        new ParticipantCountdownTimer(this,"Shooting", (RANDOM.nextInt(3) + 1) * 1000);
+        new ParticipantCountdownTimer(this, "Movement", 1000);
+        new ParticipantCountdownTimer(this, "Shooting", (RANDOM.nextInt(3) + 1) * 1000);
         this.controller = controller;
         setPosition(x, y);
         setRotation(direction);
@@ -54,66 +54,12 @@ public class Alienship extends Participant implements AsteroidDestroyer, ShipDes
 
     }
 
-    /**
-     * Tells the alien ship to re-adjust its trajectory to +1 radian above center, -1 radian, or stay on course
-     */
-    @Override
-    public void countdownComplete (Object payload)
-    {
-        if (payload == "Movement")
-        {
-        int upDownOrCenter = RANDOM.nextInt(3);
-
-        if (isMovingLeft == false)
-        {
-            if (upDownOrCenter == 0)
-            {
-                this.setDirection(0);
-            }
-            if (upDownOrCenter == 1)
-            {
-                this.setDirection(Math.PI / 4);
-            }
-            if (upDownOrCenter == 2)
-            {
-                this.setDirection(-Math.PI / 4);
-            }
-        }
-        else
-        {
-            if (upDownOrCenter == 0)
-            {
-                this.setDirection(180);
-            }
-            if (upDownOrCenter == 1)
-            {
-                this.setDirection(3 * Math.PI / 4);
-            }
-            if (upDownOrCenter == 2)
-            {
-                this.setDirection(-5 * Math.PI / 4);
-            }
-        }
-        new ParticipantCountdownTimer(this, "Movement", 1000);
-        }
-        
-        if (payload == "Shooting")
-        {
-            controller.setAlienFiring(true);
-            new ParticipantCountdownTimer(this,"Shooting", (RANDOM.nextInt(3) + 1) * 1000);
-
-            
-        }
-        
-    }
-
     @Override
     protected Shape getOutline ()
     {
         return outline;
     }
-    
-    
+
     /**
      * Returns the x-coordinate of the point on the screen where the alienship's center is located.
      */
@@ -163,6 +109,9 @@ public class Alienship extends Participant implements AsteroidDestroyer, ShipDes
             controller.placeShipDustShort(this.getX(), this.getY(), RANDOM.nextInt(8), controller);
             controller.placeShipDustShort(this.getX(), this.getY(), RANDOM.nextInt(8), controller);
             controller.setScore(200);
+            //controller.alienShipDestroyed();
+            //new ParticipantCountdownTimer(this, "Respawn", (RANDOM.nextInt(6) + 5));
+            
         }
     }
 
@@ -178,8 +127,64 @@ public class Alienship extends Participant implements AsteroidDestroyer, ShipDes
         }
         else
         {
-        this.setSpeed(4);
+            this.setSpeed(4);
         }
         return isMovingLeft;
+    }
+    
+    /**
+     * Tells the alien ship to re-adjust its trajectory to +1 radian above center, -1 radian, or stay on course
+     */
+    @Override
+    public void countdownComplete (Object payload)
+    {
+        if (payload == "Movement")
+        {
+            int upDownOrCenter = RANDOM.nextInt(3);
+
+            if (isMovingLeft == false)
+            {
+                if (upDownOrCenter == 0)
+                {
+                    this.setDirection(0);
+                }
+                if (upDownOrCenter == 1)
+                {
+                    this.setDirection(Math.PI / 4);
+                }
+                if (upDownOrCenter == 2)
+                {
+                    this.setDirection(-Math.PI / 4);
+                }
+            }
+            else
+            {
+                if (upDownOrCenter == 0)
+                {
+                    this.setDirection(180);
+                }
+                if (upDownOrCenter == 1)
+                {
+                    this.setDirection(3 * Math.PI / 4);
+                }
+                if (upDownOrCenter == 2)
+                {
+                    this.setDirection(-5 * Math.PI / 4);
+                }
+            }
+            new ParticipantCountdownTimer(this, "Movement", 1000);
+        }
+
+        if (payload == "Shooting")
+        {
+            controller.setAlienFiring(true);
+            new ParticipantCountdownTimer(this, "Shooting", (RANDOM.nextInt(3) + 1) * 1000);
+        }
+
+        //if (payload == "Respawn")
+        //{
+        //    controller.placeAlienship();
+        //}
+
     }
 }
