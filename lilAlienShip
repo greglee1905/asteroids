@@ -1,0 +1,185 @@
+package asteroids.participants;
+
+import static asteroids.game.Constants.*;
+import java.awt.Shape;
+import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
+import asteroids.destroyers.AlienShipDestroyer;
+import asteroids.destroyers.AsteroidDestroyer;
+import asteroids.destroyers.ShipDestroyer;
+import asteroids.game.Controller;
+import asteroids.game.Participant;
+import asteroids.game.ParticipantCountdownTimer;
+
+public class lilAlienShip extends Participant implements AsteroidDestroyer, ShipDestroyer
+{
+    /** The outline of the ship */
+    private Shape outline;
+
+    /** Game controller */
+    private Controller controller;
+
+    /**
+     * Defines whether the ship is moving left (true) or right (false)
+     */
+    private boolean isMovingLeft;
+
+    /**
+     * Constructs a ship at the specified coordinates that is pointed in the given direction.
+     */
+    public lilAlienShip (int x, int y, double direction, Controller controller)
+    {
+        new ParticipantCountdownTimer(this,"Movement", 1000);
+        new ParticipantCountdownTimer(this,"Shooting", (RANDOM.nextInt(3) + 1) * 100);//SHOOTS FASTER
+        this.controller = controller;
+        setPosition(x, y);
+        setRotation(direction);
+
+        Path2D.Double poly = new Path2D.Double();
+        poly.moveTo(0, 0);
+        poly.lineTo(9.5, 0);
+        poly.lineTo(-9.5, 0);
+        poly.lineTo(-4, -4);
+        poly.lineTo(4, -4);
+        poly.lineTo(9.5, 0);
+        poly.lineTo(4, 4);
+        poly.lineTo(-4, 4);
+        poly.lineTo(-9.5, 0);
+        poly.moveTo(-4, -4);
+        poly.lineTo(-3, -8);
+        poly.lineTo(3, -8);
+        poly.lineTo(4, -4);
+        poly.closePath();
+        outline = poly;
+
+    }
+
+    /**
+     * Tells the alien ship to re-adjust its trajectory to +1 radian above center, -1 radian, or stay on course
+     */
+    @Override
+    public void countdownComplete (Object payload)
+    {
+        if (payload == "Movement")
+        {
+        int upDownOrCenter = RANDOM.nextInt(3);
+
+        if (isMovingLeft == false)
+        {
+            if (upDownOrCenter == 0)
+            {
+                this.setDirection(0);
+            }
+            if (upDownOrCenter == 1)
+            {
+                this.setDirection(Math.PI / 4);
+            }
+            if (upDownOrCenter == 2)
+            {
+                this.setDirection(-Math.PI / 4);
+            }
+        }
+        else
+        {
+            if (upDownOrCenter == 0)
+            {
+                this.setDirection(180);
+            }
+            if (upDownOrCenter == 1)
+            {
+                this.setDirection(3 * Math.PI / 4);
+            }
+            if (upDownOrCenter == 2)
+            {
+                this.setDirection(-5 * Math.PI / 4);
+            }
+        }
+        new ParticipantCountdownTimer(this, "Movement", 1000);
+        }
+        
+        if (payload == "Shooting")
+        {
+            controller.setAlienFiring(true);
+            new ParticipantCountdownTimer(this,"Shooting", (RANDOM.nextInt(3) + 1) * 1000);
+
+            
+        }
+        
+    }
+
+    @Override
+    protected Shape getOutline ()
+    {
+        return outline;
+    }
+    
+    
+    /**
+     * Returns the x-coordinate of the point on the screen where the alienship's center is located.
+     */
+    public double getXCenter ()
+    {
+        Point2D.Double point = new Point2D.Double(0, 0);
+        transformPoint(point);
+        return point.getX();
+    }
+
+    /**
+     * Returns the x-coordinate of the point on the screen where the alienship's center is located.
+     */
+    public double getYCenter ()
+    {
+        Point2D.Double point = new Point2D.Double(0, 0);
+        transformPoint(point);
+        return point.getY();
+    }
+
+    /**
+     * Moves
+     */
+    @Override
+    public void move ()
+    {
+        super.move();
+    }
+
+    /**
+     * When an AlienShip collides with a ShipDestroyer, it expires
+     */
+    @Override
+    public void collidedWith (Participant p)
+    {
+        if (p instanceof AlienShipDestroyer)
+        {
+
+            // Expire the alien ship from the game
+            Participant.expire(this);
+
+            // Spawn four long ship dusts and 2 short ship dusts.
+            controller.placeShipDustLong(this.getX(), this.getY(), RANDOM.nextInt(8), controller);
+            controller.placeShipDustLong(this.getX(), this.getY(), RANDOM.nextInt(8), controller);
+            controller.placeShipDustLong(this.getX(), this.getY(), RANDOM.nextInt(8), controller);
+            controller.placeShipDustLong(this.getX(), this.getY(), RANDOM.nextInt(8), controller);
+            controller.placeShipDustShort(this.getX(), this.getY(), RANDOM.nextInt(8), controller);
+            controller.placeShipDustShort(this.getX(), this.getY(), RANDOM.nextInt(8), controller);
+            controller.setScore(200);
+        }
+    }
+
+    /**
+     * Sets to move the ship to the left or to the right permanently.
+     */
+    public boolean setMovementDirectionLeft (boolean choice)
+    {
+        if (choice)
+        {
+            isMovingLeft = true;
+            this.setSpeed(-4);
+        }
+        else
+        {
+        this.setSpeed(6);
+        }
+        return isMovingLeft;
+    }
+}
