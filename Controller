@@ -2,7 +2,13 @@ package asteroids.game;
 
 import static asteroids.game.Constants.*;
 import java.awt.event.*;
+import java.io.BufferedInputStream;
+import java.io.IOException;
 import java.util.Iterator;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import asteroids.participants.AlienBullet;
 import asteroids.participants.lilAlienShip;
@@ -123,6 +129,55 @@ public class Controller implements KeyListener, ActionListener
      * Is the AlienShip firing
      */
     private boolean lilAlienFiring;
+    
+        /**
+     * 
+     * 
+     * SOUNDS
+     * 
+     * 
+     */
+
+    // A Clip for gunfire.
+    private Clip fireClip = createClip("/sounds/fire.wav");
+
+    // A Clip that, when played repeatedly, sounds like a big saucer flying
+    private Clip bigSaucerClip = createClip("/sounds/saucerBig.wav");
+
+    // A Clip that, when played repeatedly, sounds like a small saucer flying
+    private Clip smallSaucerClip = createClip("/sounds/saucerSmall.wav");
+
+    // A Clip for the thrust
+    private Clip thrustClip = createClip("/sounds/thrust.wav");
+
+    // A Clip for beat 1
+    private Clip beat1Clip = createClip("/sounds/beat1.wav");
+
+    // A Clip for beat 2
+    private Clip beat2Clip = createClip("/sounds/beat2.wav");
+
+    // A Clip for the ship exploding
+    private Clip bangShipClip = createClip("/sounds/bangShip.wav");
+
+    // A Clip for the small asteroid exploding
+    private Clip bangSmallClip = createClip("/sounds/bangSmall.wav");
+
+    // A Clip for the medium asteroid exploding
+    private Clip bangMediumClip = createClip("/sounds/bangMedium.wav");
+
+    // A Clip for the large asteroid exploding
+    private Clip bangLargeClip = createClip("/sounds/bangLarge.wav");
+
+    // A Clip for the alien ship exploding
+    private Clip bangAlienShipClip = createClip("/sounds/bangAlienShip.wav");
+
+    /**
+     * 
+     * 
+     * END SOUNDS
+     * 
+     * 
+     */
 
     /**
      * Constructs a controller to coordinate the game and screen
@@ -553,6 +608,12 @@ public class Controller implements KeyListener, ActionListener
             if (isFiring && pstate.countBullets() < BULLET_LIMIT)
             {
                 placeBullet();
+                if (fireClip.isRunning())
+                {
+                    fireClip.stop();
+                }
+                fireClip.setFramePosition(0);
+                fireClip.start();
             }
 
             // It may be time to make a game transition
@@ -868,5 +929,35 @@ public class Controller implements KeyListener, ActionListener
     {
         lilAlienFiring = alienFire;
         return lilAlienFiring;
+    }
+        /**
+     * Creates an audio clip from a sound file.
+     */
+    public Clip createClip (String soundFile)
+    {
+        // Opening the sound file this way will work no matter how the
+        // project is exported. The only restriction is that the
+        // sound files must be stored in a package.
+        try (BufferedInputStream sound = new BufferedInputStream(getClass().getResourceAsStream(soundFile)))
+        {
+            // Create and return a Clip that will play a sound file. There are
+            // various reasons that the creation attempt could fail. If it
+            // fails, return null.
+            Clip clip = AudioSystem.getClip();
+            clip.open(AudioSystem.getAudioInputStream(sound));
+            return clip;
+        }
+        catch (LineUnavailableException e)
+        {
+            return null;
+        }
+        catch (IOException e)
+        {
+            return null;
+        }
+        catch (UnsupportedAudioFileException e)
+        {
+            return null;
+        }
     }
 }
