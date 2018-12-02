@@ -6,6 +6,7 @@ import java.util.Iterator;
 import javax.swing.*;
 import asteroids.participants.AlienBullet;
 import asteroids.participants.lilAlienShip;
+import asteroids.participants.lilAlienBullet;
 import asteroids.participants.Alienship;
 import asteroids.participants.Asteroid;
 import asteroids.participants.Bullet;
@@ -34,6 +35,11 @@ public class Controller implements KeyListener, ActionListener
      * Alien bullets if active
      */
     private AlienBullet alienbullet;
+    
+    /**
+     * Alien bullets if active
+     */
+    private AlienBullet lilAlienBullet;
 
     /**
      * Alien Ship if active
@@ -110,6 +116,7 @@ public class Controller implements KeyListener, ActionListener
      * Is the AlienShip firing
      */
     private boolean lilAlienFiring;
+
 
     /**
      * Constructs a controller to coordinate the game and screen
@@ -222,7 +229,7 @@ public class Controller implements KeyListener, ActionListener
         // Places ship randomly on y axis at far left of screen
         if (leftOrRight == 0)
         {
-             alienShip = new Alienship(0, RANDOM.nextInt(SIZE), 0, this);
+           alienShip = new Alienship(0, RANDOM.nextInt(SIZE), 0, this);
             alienShip.setMovementDirectionLeft(false);
             alienShip.setVelocity(alienShip.getSpeed(), alienShip.getDirection());
             addParticipant(alienShip);
@@ -327,13 +334,24 @@ public class Controller implements KeyListener, ActionListener
         addParticipant(new Bullet(ship.getXNose(), ship.getYNose(), ship.getRotation(), this));
     }
 
+ 
     /**
      * Finds place to shoot the alien bullet.
      */
     private void placeAlienBullet ()
     {
-        addParticipant(new AlienBullet(lilAlienShip.getX(),lilAlienShip.getY(),Math.atan2(ship.getX(),ship.getY()) + 2.*Math.PI, this)); //There is an issue here with the tangent not being taken relative from the lilspaceship to the actual ship
+        addParticipant(new AlienBullet(alienShip.getX(),alienShip.getY(), RANDOM.nextInt(8), this)); 
         this.setAlienFiring(false);
+    }
+    
+    /**
+     * Finds place to shoot the lilAlienBullet.
+     */
+    private void placelilAlienBullet ()
+    {
+      //This method has many issues. including finding and tracking and dealing with when the ship is nul
+        addParticipant(new lilAlienBullet(lilAlienShip.getX(),lilAlienShip.getY(),Math.atan2(ship.getX(),ship.getY()) + 2.*Math.PI, this)); 
+        this.setlilAlienFiring(false);
     }
 
     /**
@@ -435,6 +453,11 @@ public class Controller implements KeyListener, ActionListener
     {
         alienbullet = null;
     }
+    
+    public void lilalienBulletDestroyed ()
+    {
+        lilAlienBullet = null;
+    }
 
     /**
      * Schedules a transition m msecs in the future
@@ -460,15 +483,17 @@ public class Controller implements KeyListener, ActionListener
         // Time to refresh the screen and deal with keyboard input
         else if (e.getSource() == refreshTimer)
         {
-            if (this.getIsAlienFiring() == true)
+            if (this.getIsAlienFiring() == true && alienShip != null )
             {
-                placeAlienBullet();
+                    placeAlienBullet();
+            }
+                
+            if (this.getIslilAlienFiring() == true && lilAlienShip != null && ship != null )
+            {
+                    placelilAlienBullet();
             }
             
-            if (this.getIslilAlienFiring() == true)
-            {
-                placeAlienBullet();
-            }
+            
             
             if (ship != null && isTurningRight)
             {
@@ -484,7 +509,6 @@ public class Controller implements KeyListener, ActionListener
             {
                 toggleFlickering();
                 ship.accelerate();
-                // Error here since the ship is still trying to accelerate when getting hit by the asteroid
             }
 
             if (isFiring && pstate.countBullets() < BULLET_LIMIT)
@@ -499,7 +523,6 @@ public class Controller implements KeyListener, ActionListener
             pstate.moveParticipants();
 
             // Refresh screen
-            // I think you need to update the refresh time to make the game smoother
             if (System.currentTimeMillis() % 100 > 1)
                 display.refresh();
         }
@@ -529,7 +552,7 @@ public class Controller implements KeyListener, ActionListener
             if (this.getLevel() == 2 && shipdeath == false)
             {
                 placeShip();
-                
+                placelilAlienShip();
                 placeAsteroids();
 
                 // Placing two Additional Asteroids
