@@ -5,6 +5,7 @@ import java.awt.event.*;
 import java.util.Iterator;
 import javax.swing.*;
 import asteroids.participants.AlienBullet;
+import asteroids.participants.lilAlienShip;
 import asteroids.participants.Alienship;
 import asteroids.participants.Asteroid;
 import asteroids.participants.Bullet;
@@ -38,6 +39,11 @@ public class Controller implements KeyListener, ActionListener
      * Alien Ship if active
      */
     private Alienship alienShip;
+    
+    /**
+     * Alien Ship if active
+     */
+    private lilAlienShip lilAlienShip;
 
     /** When this timer goes off, it is time to refresh the animation */
     private Timer refreshTimer;
@@ -94,6 +100,16 @@ public class Controller implements KeyListener, ActionListener
      * Is the ship flickering
      */
     private boolean isFlickering;
+    
+    /**
+     * Is the AlienShip firing
+     */
+    private boolean alienFiring;
+    
+    /**
+     * Is the AlienShip firing
+     */
+    private boolean lilAlienFiring;
 
     /**
      * Constructs a controller to coordinate the game and screen
@@ -206,23 +222,49 @@ public class Controller implements KeyListener, ActionListener
         // Places ship randomly on y axis at far left of screen
         if (leftOrRight == 0)
         {
-            Alienship alienship = new Alienship(0, RANDOM.nextInt(SIZE), 0, this);
-            alienship.setMovementDirectionLeft(false);
-            alienship.setVelocity(alienship.getSpeed(), alienship.getDirection());
-            addParticipant(alienship);
+             alienShip = new Alienship(0, RANDOM.nextInt(SIZE), 0, this);
+            alienShip.setMovementDirectionLeft(false);
+            alienShip.setVelocity(alienShip.getSpeed(), alienShip.getDirection());
+            addParticipant(alienShip);
         }
 
         // Places ship at random y axis at far right of screen.
         else
         {
-            Alienship alienship = new Alienship(SIZE, RANDOM.nextInt(SIZE), 0, this);
-            alienship.setMovementDirectionLeft(true);
-            alienship.setVelocity(alienship.getSpeed(), alienship.getDirection());
-            addParticipant(alienship);
+           alienShip = new Alienship(SIZE, RANDOM.nextInt(SIZE), 0, this);
+            alienShip.setMovementDirectionLeft(true);
+            alienShip.setVelocity(alienShip.getSpeed(), alienShip.getDirection());
+            addParticipant(alienShip);
 
         }
+        
     }
 
+    private void placelilAlienShip ()
+    {
+        // Generates 0 or 1 randomly
+        int leftOrRight = Math.round(RANDOM.nextFloat());
+
+        // Places ship randomly on y axis at far left of screen
+        if (leftOrRight == 0)
+        {
+             lilAlienShip = new lilAlienShip(0, RANDOM.nextInt(SIZE), 0, this);
+            lilAlienShip.setMovementDirectionLeft(false);
+            lilAlienShip.setVelocity(lilAlienShip.getSpeed(), lilAlienShip.getDirection());
+            addParticipant(lilAlienShip);
+        }
+
+        // Places ship at random y axis at far right of screen.
+        else
+        {
+            lilAlienShip = new lilAlienShip(SIZE, RANDOM.nextInt(SIZE), 0, this);
+            lilAlienShip.setMovementDirectionLeft(true);
+            lilAlienShip.setVelocity(lilAlienShip.getSpeed(), lilAlienShip.getDirection());
+            addParticipant(lilAlienShip);
+
+        }
+        
+    }
     /**
      * Places an asteroid near one corner of the screen. Gives it a random velocity and rotation. GL Note: Set 4 total
      * with one in each corner. Checked size and type for asteroid. Good.
@@ -290,7 +332,8 @@ public class Controller implements KeyListener, ActionListener
      */
     private void placeAlienBullet ()
     {
-        addParticipant(new AlienBullet(alienShip.getXCenter(), alienShip.getYCenter(), alienShip.getDirection(), this));
+        addParticipant(new AlienBullet(lilAlienShip.getX(),lilAlienShip.getY(),Math.atan2(ship.getX(),ship.getY()) + 2.*Math.PI, this)); //There is an issue here with the tangent not being taken relative from the lilspaceship to the actual ship
+        this.setAlienFiring(false);
     }
 
     /**
@@ -312,13 +355,14 @@ public class Controller implements KeyListener, ActionListener
         clear();
 
         // Place asteroids
-        placeAsteroids();
+        //placeAsteroids();
 
         // Place the ship
         placeShip();
 
-        //
-        placeAlienship();
+        //USED FOR TESTING
+        //placeAlienship();
+        placelilAlienShip();
 
         // Reset statistics
         lives = 3;
@@ -416,6 +460,16 @@ public class Controller implements KeyListener, ActionListener
         // Time to refresh the screen and deal with keyboard input
         else if (e.getSource() == refreshTimer)
         {
+            if (this.getIsAlienFiring() == true)
+            {
+                placeAlienBullet();
+            }
+            
+            if (this.getIslilAlienFiring() == true)
+            {
+                placeAlienBullet();
+            }
+            
             if (ship != null && isTurningRight)
             {
                 ship.turnRight();
@@ -471,10 +525,12 @@ public class Controller implements KeyListener, ActionListener
             transitionTime = Long.MAX_VALUE;
 
             // Changing the level values
+            //THERE IS ALSO A BUG with if the ship collides into the last boulder on the screen
             if (this.getLevel() == 2 && shipdeath == false)
             {
                 placeShip();
-                this.placeAsteroids();
+                
+                placeAsteroids();
 
                 // Placing two Additional Asteroids
                 int placeholder = RANDOM.nextInt(3);
@@ -526,6 +582,7 @@ public class Controller implements KeyListener, ActionListener
             // New Asteroid placed
             if (this.getLevel() == 1 && shipdeath == false)
             {
+                placeAlienship();
                 placeShip();
                 this.placeAsteroids();
 
@@ -701,5 +758,27 @@ public class Controller implements KeyListener, ActionListener
     public boolean getIsFlickering ()
     {
         return isFlickering;
+    }
+    
+    public boolean getIsAlienFiring ()
+    {
+        return alienFiring;
+    }
+    
+    public boolean setAlienFiring (boolean alienFire)
+    {
+        alienFiring = alienFire;
+        return alienFiring;
+    }
+    
+    public boolean getIslilAlienFiring ()
+    {
+        return lilAlienFiring;
+    }
+    
+    public boolean setlilAlienFiring (boolean alienFire)
+    {
+        lilAlienFiring = alienFire;
+        return lilAlienFiring;
     }
 }
