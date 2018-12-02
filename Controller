@@ -199,10 +199,12 @@ public class Controller implements KeyListener, ActionListener
     */
    private void placeAsteroids ()
    {
-       addParticipant(new Asteroid(1, 2, EDGE_OFFSET+450, EDGE_OFFSET, 3, this));
-       addParticipant(new Asteroid(2, 2, EDGE_OFFSET, EDGE_OFFSET+450, 3, this));
-       addParticipant(new Asteroid(3, 2, EDGE_OFFSET+450, EDGE_OFFSET+450, 3, this));
-       addParticipant(new Asteroid(0, 2, EDGE_OFFSET, EDGE_OFFSET, 3, this));
+       //Possibly just add random variable here which changes how much offset can happen. Will probably be easiest
+       //way to modulate where the load in 
+       addParticipant(new Asteroid(1, 2, EDGE_OFFSET+500 -  RANDOM.nextInt(100), EDGE_OFFSET -50 + RANDOM.nextInt(100), 3, this));
+       addParticipant(new Asteroid(2, 2, EDGE_OFFSET-50+ RANDOM.nextInt(100), EDGE_OFFSET+500- RANDOM.nextInt(100), 3, this));
+       addParticipant(new Asteroid(3, 2, EDGE_OFFSET+500- RANDOM.nextInt(100), EDGE_OFFSET+500- RANDOM.nextInt(100), 3, this));
+       addParticipant(new Asteroid(0, 2, EDGE_OFFSET-50 + RANDOM.nextInt(100), EDGE_OFFSET - 50+ RANDOM.nextInt(100), 3, this));
    }
    
    /**
@@ -427,36 +429,36 @@ public class Controller implements KeyListener, ActionListener
                int placeholder2 = RANDOM.nextInt(3);
                if (placeholder == 0)
                {
-                   addParticipant(new Asteroid(1, 2, EDGE_OFFSET+450, EDGE_OFFSET, 3, this));
+                   addParticipant(new Asteroid(1, 2, EDGE_OFFSET+500 -  RANDOM.nextInt(100), EDGE_OFFSET -50 + RANDOM.nextInt(100), 3, this));
                }
                if (placeholder == 1)
                {
-                   addParticipant(new Asteroid(2, 2, EDGE_OFFSET, EDGE_OFFSET+450, 3, this));
+                   addParticipant(new Asteroid(2, 2, EDGE_OFFSET-50+ RANDOM.nextInt(100), EDGE_OFFSET+500- RANDOM.nextInt(100), 3, this));
                }
                if (placeholder == 2)
                {
-                   addParticipant(new Asteroid(3, 2, EDGE_OFFSET+450, EDGE_OFFSET+450, 3, this));
+                   addParticipant(new Asteroid(3, 2, EDGE_OFFSET+500- RANDOM.nextInt(100), EDGE_OFFSET+500- RANDOM.nextInt(100), 3, this));
                }
                if (placeholder == 3)
                {
-                   addParticipant(new Asteroid(0, 2, EDGE_OFFSET, EDGE_OFFSET, 3, this));
+                   addParticipant(new Asteroid(0, 2, EDGE_OFFSET-50 + RANDOM.nextInt(100), EDGE_OFFSET - 50+ RANDOM.nextInt(100), 3, this));
                }
                
                if (placeholder2 == 0)
                {
-                   addParticipant(new Asteroid(1, 2, EDGE_OFFSET+450, EDGE_OFFSET, 3, this));
+                   addParticipant(new Asteroid(1, 2, EDGE_OFFSET+500 -  RANDOM.nextInt(100), EDGE_OFFSET -50 + RANDOM.nextInt(100), 3, this));
                }
                if (placeholder2 == 1)
                {
-                   addParticipant(new Asteroid(2, 2, EDGE_OFFSET, EDGE_OFFSET+450, 3, this));
+                   addParticipant(new Asteroid(2, 2, EDGE_OFFSET-50+ RANDOM.nextInt(100), EDGE_OFFSET+500- RANDOM.nextInt(100), 3, this));
                }
                if (placeholder2 == 2)
                {
-                   addParticipant(new Asteroid(3, 2, EDGE_OFFSET+450, EDGE_OFFSET+450, 3, this));
+                   addParticipant(new Asteroid(3, 2, EDGE_OFFSET+500- RANDOM.nextInt(100), EDGE_OFFSET+500- RANDOM.nextInt(100), 3, this));
                }
                if (placeholder2 == 3)
                {
-                   addParticipant(new Asteroid(0, 2, EDGE_OFFSET, EDGE_OFFSET, 3, this));
+                   addParticipant(new Asteroid(0, 2, EDGE_OFFSET-50 + RANDOM.nextInt(100), EDGE_OFFSET - 50+ RANDOM.nextInt(100), 3, this));
                }
 
                level = 3;   
@@ -469,20 +471,21 @@ public class Controller implements KeyListener, ActionListener
                int placeholder = RANDOM.nextInt(3);
                if (placeholder == 0)
                {
-                   addParticipant(new Asteroid(1, 2, EDGE_OFFSET+450, EDGE_OFFSET, 3, this));
+                   addParticipant(new Asteroid(1, 2, EDGE_OFFSET+500 -  RANDOM.nextInt(100), EDGE_OFFSET -50 + RANDOM.nextInt(100), 3, this));
                }
                if (placeholder == 1)
                {
-                   addParticipant(new Asteroid(2, 2, EDGE_OFFSET, EDGE_OFFSET+450, 3, this));
+                   addParticipant(new Asteroid(2, 2, EDGE_OFFSET-50+ RANDOM.nextInt(100), EDGE_OFFSET+500- RANDOM.nextInt(100), 3, this));
                }
                if (placeholder == 2)
                {
-                   addParticipant(new Asteroid(3, 2, EDGE_OFFSET+450, EDGE_OFFSET+450, 3, this));
+                   addParticipant(new Asteroid(3, 2, EDGE_OFFSET+500- RANDOM.nextInt(100), EDGE_OFFSET+500- RANDOM.nextInt(100), 3, this));
                }
                if (placeholder == 3)
                {
-                   addParticipant(new Asteroid(0, 2, EDGE_OFFSET, EDGE_OFFSET, 3, this));
+                   addParticipant(new Asteroid(0, 2, EDGE_OFFSET-50 + RANDOM.nextInt(100), EDGE_OFFSET - 50+ RANDOM.nextInt(100), 3, this));
                }
+               
                level = 2;   
            }
            
