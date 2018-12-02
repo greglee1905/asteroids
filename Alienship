@@ -1,6 +1,6 @@
 package asteroids.participants;
 
-import static asteroids.game.Constants.RANDOM;
+import static asteroids.game.Constants.*;
 import java.awt.Shape;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
@@ -9,6 +9,7 @@ import asteroids.destroyers.AsteroidDestroyer;
 import asteroids.destroyers.ShipDestroyer;
 import asteroids.game.Controller;
 import asteroids.game.Participant;
+import asteroids.game.ParticipantCountdownTimer;
 
 public class Alienship extends Participant implements AsteroidDestroyer, ShipDestroyer
 {
@@ -19,10 +20,16 @@ public class Alienship extends Participant implements AsteroidDestroyer, ShipDes
     private Controller controller;
 
     /**
+     * Defines whether the ship is moving left (true) or right (false)
+     */
+    private boolean isMovingLeft;
+
+    /**
      * Constructs a ship at the specified coordinates that is pointed in the given direction.
      */
     public Alienship (int x, int y, double direction, Controller controller)
     {
+        new ParticipantCountdownTimer(this, 1000);
         this.controller = controller;
         setPosition(x, y);
         setRotation(direction);
@@ -46,12 +53,53 @@ public class Alienship extends Participant implements AsteroidDestroyer, ShipDes
 
     }
 
+    /**
+     * Tells the alienship to readjust its trajectory to +1 radian above center, -1 radian, or stay on course
+     */
+    @Override
+    public void countdownComplete (Object payload)
+    {
+        int upDownOrCenter = RANDOM.nextInt(3);
+
+        if (isMovingLeft == false)
+        {
+            if (upDownOrCenter == 0)
+            {
+                this.setDirection(0);
+            }
+            if (upDownOrCenter == 1)
+            {
+                this.setDirection(57.2985);
+            }
+            if (upDownOrCenter == 2)
+            {
+                this.setDirection(-57.2985);
+            }
+        }
+        else
+        {
+            if (upDownOrCenter == 0)
+            {
+                this.setDirection(180);
+            }
+            if (upDownOrCenter == 1)
+            {
+                this.setDirection(122.7042);
+            }
+            if (upDownOrCenter == 2)
+            {
+                this.setDirection(-122.7042);
+            }
+        }
+        new ParticipantCountdownTimer(this, 1000);
+    }
+
     @Override
     protected Shape getOutline ()
     {
         return outline;
     }
-    
+
     /**
      * Returns the x-coordinate of the point on the screen where the alienship's center is located.
      */
@@ -73,6 +121,15 @@ public class Alienship extends Participant implements AsteroidDestroyer, ShipDes
     }
 
     /**
+     * Moves
+     */
+    @Override
+    public void move ()
+    {
+        super.move();
+    }
+
+    /**
      * When an AlienShip collides with a ShipDestroyer, it expires
      */
     @Override
@@ -80,19 +137,33 @@ public class Alienship extends Participant implements AsteroidDestroyer, ShipDes
     {
         if (p instanceof AlienShipDestroyer)
         {
-            
-            // Expire the alienship from the game
-            Participant.expire(this);  
-            
+
+            // Expire the alien ship from the game
+            Participant.expire(this);
+
             // Spawn four long ship dusts and 2 short ship dusts.
-            controller.placeShipDustLong(this.getX(),this.getY(), RANDOM.nextInt(8), controller);
-            controller.placeShipDustLong(this.getX(),this.getY(), RANDOM.nextInt(8), controller);
-            controller.placeShipDustLong(this.getX(),this.getY(), RANDOM.nextInt(8), controller);
-            controller.placeShipDustLong(this.getX(),this.getY(), RANDOM.nextInt(8), controller);
-            controller.placeShipDustShort(this.getX(),this.getY(), RANDOM.nextInt(8), controller);
-            controller.placeShipDustShort(this.getX(),this.getY(), RANDOM.nextInt(8), controller);
+            controller.placeShipDustLong(this.getX(), this.getY(), RANDOM.nextInt(8), controller);
+            controller.placeShipDustLong(this.getX(), this.getY(), RANDOM.nextInt(8), controller);
+            controller.placeShipDustLong(this.getX(), this.getY(), RANDOM.nextInt(8), controller);
+            controller.placeShipDustLong(this.getX(), this.getY(), RANDOM.nextInt(8), controller);
+            controller.placeShipDustShort(this.getX(), this.getY(), RANDOM.nextInt(8), controller);
+            controller.placeShipDustShort(this.getX(), this.getY(), RANDOM.nextInt(8), controller);
             controller.setScore(200);
         }
+    }
+
+    /**
+     * Sets to move the ship to the left or to the right permanently.
+     */
+    public boolean setMovementDirectionLeft (boolean choice)
+    {
+        if (choice)
+        {
+            isMovingLeft = true;
+            this.setSpeed(4);
+        }
+        this.setSpeed(-4);
+        return isMovingLeft;
     }
 
 }
