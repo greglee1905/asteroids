@@ -97,6 +97,14 @@ public class Alienship extends Participant implements AsteroidDestroyer, ShipDes
         new ParticipantCountdownTimer(this, "Movement", 1000);
         }
         
+        if (payload == "Shooting")
+        {
+            controller.setAlienFiring(true);
+            new ParticipantCountdownTimer(this,"Shooting", (RANDOM.nextInt(3) + 1) * 1000);
+
+            
+        }
+        
     }
 
     @Override
@@ -174,7 +182,4 @@ public class Alienship extends Participant implements AsteroidDestroyer, ShipDes
         }
         return isMovingLeft;
     }
-    
-    
-
 }
