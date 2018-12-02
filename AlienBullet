@@ -1,0 +1,53 @@
+package asteroids.participants;
+
+import static asteroids.game.Constants.*;
+import java.awt.Shape;
+import java.awt.geom.Path2D;
+import asteroids.destroyers.AlienBulletDestroyer;
+import asteroids.destroyers.AsteroidDestroyer;
+import asteroids.destroyers.ShipDestroyer;
+import asteroids.game.Controller;
+import asteroids.game.Participant;
+import asteroids.game.ParticipantCountdownTimer;
+
+public class AlienBullet extends Bullet implements AsteroidDestroyer, ShipDestroyer
+{   
+    /** The outline of the ship */
+    private Shape outline;
+
+    /** Game controller */
+    private Controller controller;
+
+    public AlienBullet (double x, double y, double direction, Controller controller)
+    {
+        new ParticipantCountdownTimer(this,BULLET_DURATION);
+        this.controller = controller;
+        setPosition(x, y);
+        setVelocity(BULLET_SPEED,direction);
+        
+        Path2D.Double poly = new Path2D.Double();
+        poly.moveTo(0, 0);
+        poly.lineTo(0, 1);
+        poly.lineTo(1, 1);
+        poly.lineTo(1, 0);
+        poly.closePath();
+        outline = poly;
+        this.move();
+
+    }
+    /**
+     * When a Bullet collides with a BulletDestroyer, it expires
+     */
+    @Override
+    public void collidedWith (Participant p)
+    {
+        if (p instanceof AlienBulletDestroyer)
+        {
+            // Expire the bullet from the game
+            Participant.expire(this);
+            controller.alienBulletDestroyed();
+
+        }
+    }
+
+}
