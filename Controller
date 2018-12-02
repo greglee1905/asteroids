@@ -350,16 +350,18 @@ public class Controller implements KeyListener, ActionListener
     {
         double angle = 0.0;
         int marker = RANDOM.nextInt(1);
-        if (marker ==0)
+        if (marker == 0)
         {
-           angle = Math.atan2(lilAlienShip.getY()-ship.getY(),lilAlienShip.getX()-ship.getX())+ (Math.PI + (RANDOM.nextInt(87)*0.001));
+            angle = Math.atan2(lilAlienShip.getY() - ship.getY(), lilAlienShip.getX() - ship.getX())
+                    + (Math.PI + (RANDOM.nextInt(87) * 0.001));
         }
         else
         {
-            angle = Math.atan2(lilAlienShip.getY()-ship.getY(),lilAlienShip.getX()-ship.getX())+ (Math.PI - (RANDOM.nextInt(87)*0.001));   
+            angle = Math.atan2(lilAlienShip.getY() - ship.getY(), lilAlienShip.getX() - ship.getX())
+                    + (Math.PI - (RANDOM.nextInt(87) * 0.001));
         }
 
-        addParticipant(new lilAlienBullet(lilAlienShip.getX(),lilAlienShip.getY(), angle, this)); 
+        addParticipant(new lilAlienBullet(lilAlienShip.getX(), lilAlienShip.getY(), angle, this));
         this.setlilAlienFiring(false);
     }
 
@@ -566,52 +568,66 @@ public class Controller implements KeyListener, ActionListener
             if (this.getLevel() == 2 && shipdeath == false)
             {
                 placeShip();
+                placeAsteroids();
                 placeAlienship();
+
+                for (int i = 0; i < (level - 1); i++)
+                {
+                    // Placing one Additional Asteroids
+                    int placeholder = RANDOM.nextInt(3);
+                    if (placeholder == 0)
+                    {
+                        addParticipant(new Asteroid(1, 2, EDGE_OFFSET + 500 - RANDOM.nextInt(100),
+                                EDGE_OFFSET - 50 + RANDOM.nextInt(100), 3, this));
+                    }
+                    if (placeholder == 1)
+                    {
+                        addParticipant(new Asteroid(2, 2, EDGE_OFFSET - 50 + RANDOM.nextInt(100),
+                                EDGE_OFFSET + 500 - RANDOM.nextInt(100), 3, this));
+                    }
+                    if (placeholder == 2)
+                    {
+                        addParticipant(new Asteroid(3, 2, EDGE_OFFSET + 500 - RANDOM.nextInt(100),
+                                EDGE_OFFSET + 500 - RANDOM.nextInt(100), 3, this));
+                    }
+                    if (placeholder == 3)
+                    {
+                        addParticipant(new Asteroid(0, 2, EDGE_OFFSET - 50 + RANDOM.nextInt(100),
+                                EDGE_OFFSET - 50 + RANDOM.nextInt(100), 3, this));
+                    }
+                }
+            }
+
+            if (this.getLevel() >= 3 && shipdeath == false)
+            {
+                placeShip();
+                //placelilAlienShip();
                 placeAsteroids();
 
-                // Placing two Additional Asteroids
-                int placeholder = RANDOM.nextInt(3);
-                int placeholder2 = RANDOM.nextInt(3);
-                if (placeholder == 0)
+                for (int i = 0; i < (level - 1); i++)
                 {
-                    addParticipant(new Asteroid(1, 2, EDGE_OFFSET + 500 - RANDOM.nextInt(100),
-                            EDGE_OFFSET - 50 + RANDOM.nextInt(100), 3, this));
-                }
-                if (placeholder == 1)
-                {
-                    addParticipant(new Asteroid(2, 2, EDGE_OFFSET - 50 + RANDOM.nextInt(100),
-                            EDGE_OFFSET + 500 - RANDOM.nextInt(100), 3, this));
-                }
-                if (placeholder == 2)
-                {
-                    addParticipant(new Asteroid(3, 2, EDGE_OFFSET + 500 - RANDOM.nextInt(100),
-                            EDGE_OFFSET + 500 - RANDOM.nextInt(100), 3, this));
-                }
-                if (placeholder == 3)
-                {
-                    addParticipant(new Asteroid(0, 2, EDGE_OFFSET - 50 + RANDOM.nextInt(100),
-                            EDGE_OFFSET - 50 + RANDOM.nextInt(100), 3, this));
-                }
-
-                if (placeholder2 == 0)
-                {
-                    addParticipant(new Asteroid(1, 2, EDGE_OFFSET + 500 - RANDOM.nextInt(100),
-                            EDGE_OFFSET - 50 + RANDOM.nextInt(100), 3, this));
-                }
-                if (placeholder2 == 1)
-                {
-                    addParticipant(new Asteroid(2, 2, EDGE_OFFSET - 50 + RANDOM.nextInt(100),
-                            EDGE_OFFSET + 500 - RANDOM.nextInt(100), 3, this));
-                }
-                if (placeholder2 == 2)
-                {
-                    addParticipant(new Asteroid(3, 2, EDGE_OFFSET + 500 - RANDOM.nextInt(100),
-                            EDGE_OFFSET + 500 - RANDOM.nextInt(100), 3, this));
-                }
-                if (placeholder2 == 3)
-                {
-                    addParticipant(new Asteroid(0, 2, EDGE_OFFSET - 50 + RANDOM.nextInt(100),
-                            EDGE_OFFSET - 50 + RANDOM.nextInt(100), 3, this));
+                    // Placing one Additional Asteroids
+                    int placeholder = RANDOM.nextInt(3);
+                    if (placeholder == 0)
+                    {
+                        addParticipant(new Asteroid(1, 2, EDGE_OFFSET + 500 - RANDOM.nextInt(100),
+                                EDGE_OFFSET - 50 + RANDOM.nextInt(100), 3, this));
+                    }
+                    if (placeholder == 1)
+                    {
+                        addParticipant(new Asteroid(2, 2, EDGE_OFFSET - 50 + RANDOM.nextInt(100),
+                                EDGE_OFFSET + 500 - RANDOM.nextInt(100), 3, this));
+                    }
+                    if (placeholder == 2)
+                    {
+                        addParticipant(new Asteroid(3, 2, EDGE_OFFSET + 500 - RANDOM.nextInt(100),
+                                EDGE_OFFSET + 500 - RANDOM.nextInt(100), 3, this));
+                    }
+                    if (placeholder == 3)
+                    {
+                        addParticipant(new Asteroid(0, 2, EDGE_OFFSET - 50 + RANDOM.nextInt(100),
+                                EDGE_OFFSET - 50 + RANDOM.nextInt(100), 3, this));
+                    }
                 }
             }
 
