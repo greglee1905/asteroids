@@ -29,7 +29,8 @@ public class Alienship extends Participant implements AsteroidDestroyer, ShipDes
      */
     public Alienship (int x, int y, double direction, Controller controller)
     {
-        new ParticipantCountdownTimer(this, 1000);
+        new ParticipantCountdownTimer(this,"Movement", 1000);
+        new ParticipantCountdownTimer(this,"Shooting", (RANDOM.nextInt(3) + 1) * 1000);
         this.controller = controller;
         setPosition(x, y);
         setRotation(direction);
@@ -54,11 +55,13 @@ public class Alienship extends Participant implements AsteroidDestroyer, ShipDes
     }
 
     /**
-     * Tells the alienship to readjust its trajectory to +1 radian above center, -1 radian, or stay on course
+     * Tells the alien ship to re-adjust its trajectory to +1 radian above center, -1 radian, or stay on course
      */
     @Override
     public void countdownComplete (Object payload)
     {
+        if (payload == "Movement")
+        {
         int upDownOrCenter = RANDOM.nextInt(3);
 
         if (isMovingLeft == false)
@@ -91,7 +94,9 @@ public class Alienship extends Participant implements AsteroidDestroyer, ShipDes
                 this.setDirection(-5 * Math.PI / 4);
             }
         }
-        new ParticipantCountdownTimer(this, 1000);
+        new ParticipantCountdownTimer(this, "Movement", 1000);
+        }
+        
     }
 
     @Override
@@ -99,7 +104,8 @@ public class Alienship extends Participant implements AsteroidDestroyer, ShipDes
     {
         return outline;
     }
-
+    
+    
     /**
      * Returns the x-coordinate of the point on the screen where the alienship's center is located.
      */
@@ -168,5 +174,7 @@ public class Alienship extends Participant implements AsteroidDestroyer, ShipDes
         }
         return isMovingLeft;
     }
+    
+    
 
 }
