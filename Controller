@@ -60,6 +60,13 @@ public class Controller implements KeyListener, ActionListener
      * resetting the current level.
      */
     private long transitionTime;
+    
+    /**
+     * The time at which a transition to a new stage of the game should be made. A transition is scheduled a few seconds
+     * in the future to give the user time to see what has happened before doing something like going to a new level or
+     * resetting the current level. 4 ALIENS
+     */
+    private long transitionTimealien;
 
     /** Number of lives left */
     private int lives;
@@ -339,7 +346,7 @@ public class Controller implements KeyListener, ActionListener
      */
     private void placeAlienBullet ()
     {
-        addParticipant(new AlienBullet(alienShip.getX(), alienShip.getY(), RANDOM.nextInt(8), this));
+        addParticipant(new AlienBullet(alienShip.getX(), alienShip.getY(), RANDOM.nextInt(80)*0.1, this));
         this.setAlienFiring(false);
     }
 
@@ -390,8 +397,9 @@ public class Controller implements KeyListener, ActionListener
         placeShip();
 
         // USED FOR TESTING
-        // placeAlienship();
-        // placelilAlienShip();
+       // lilalienShipDestroyed();
+        //alienShipDestroyed();
+
 
         // Reset statistics
         lives = 3;
@@ -444,8 +452,16 @@ public class Controller implements KeyListener, ActionListener
 
     public void alienShipDestroyed ()
     {
-        score = this.getScore();
         alienShip = null;
+        scheduleTransitionalien(RANDOM.nextInt(5000)+5000);
+        
+    }
+    
+    public void lilalienShipDestroyed ()
+    {
+        lilAlienShip = null;
+        scheduleTransitionalien(RANDOM.nextInt(5000)+5000);
+        
     }
 
     /**
@@ -453,11 +469,8 @@ public class Controller implements KeyListener, ActionListener
      */
     public void asteroidDestroyed ()
     {
-        score = this.getScore();
-
         if (pstate.countAsteroids() == 0)
         {
-            level += 1;
             scheduleTransition(END_DELAY);
         }
     }
@@ -484,6 +497,15 @@ public class Controller implements KeyListener, ActionListener
     {
         transitionTime = System.currentTimeMillis() + m;
     }
+    
+    /**
+     * Schedules a transition m msecs in the future
+     */
+    private void scheduleTransitionalien (int m)
+    {
+        transitionTimealien = System.currentTimeMillis() + m;
+    }
+
 
     /**
      * This method will be invoked because of button presses and timer events.
@@ -534,6 +556,7 @@ public class Controller implements KeyListener, ActionListener
 
             // It may be time to make a game transition
             performTransition();
+            performTransitionalien();
 
             // Move the participants to their new locations
             pstate.moveParticipants();
@@ -562,14 +585,21 @@ public class Controller implements KeyListener, ActionListener
         {
             // Clear the transition time
             transitionTime = Long.MAX_VALUE;
+            
 
+            
+            if (lives>0 && pstate.countAsteroids()==0)
+            {
+                level += 1;
             // Changing the level values
             // THERE IS ALSO A BUG with if the ship collides into the last boulder on the screen
-            if (this.getLevel() == 2 && shipdeath == false)
+            if (this.getLevel() == 2 )
             {
+                alienShipDestroyed();
+                
                 placeShip();
                 placeAsteroids();
-                placeAlienship();
+                
 
                 for (int i = 0; i < (level - 1); i++)
                 {
@@ -598,11 +628,13 @@ public class Controller implements KeyListener, ActionListener
                 }
             }
 
-            if (this.getLevel() >= 3 && shipdeath == false)
+            if (this.getLevel() >= 3 )
             {
                 placeShip();
-                //placelilAlienShip();
                 placeAsteroids();
+                lilalienShipDestroyed();
+                
+               
 
                 for (int i = 0; i < (level - 1); i++)
                 {
@@ -630,7 +662,8 @@ public class Controller implements KeyListener, ActionListener
                     }
                 }
             }
-
+            }
+            
             if (lives > 0 && shipdeath == true)
             {
                 placeShip();
@@ -644,6 +677,35 @@ public class Controller implements KeyListener, ActionListener
                 finalScreen();
             }
 
+        }
+    }
+    
+    /**
+     * If the transition time has been reached, transition to a new state
+     */
+    private void performTransitionalien ()
+    {
+        // Do something only if the time has been reached
+        if (transitionTimealien <= System.currentTimeMillis())
+        {
+            // Clear the transition time
+            transitionTimealien = Long.MAX_VALUE;
+            // Place Alienships if one has been destroyed
+            if (this.getLevel()==2)
+            {
+                if (alienShip == null)
+                {
+                    placeAlienship();
+                }
+            }
+        
+            if (this.getLevel()>2)
+            {
+                if (lilAlienShip == null)
+                {
+                    placelilAlienShip();
+                }
+            }
         }
     }
 
