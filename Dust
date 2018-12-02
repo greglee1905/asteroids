@@ -17,7 +17,7 @@ public class Dust extends Participant
 
     public Dust (double x, double y, double direction, Controller controller)
     {
-        new ParticipantCountdownTimer(this,2000); //Possibly change value of timer
+        new ParticipantCountdownTimer(this,1500); //Possibly change value of timer
         this.controller = controller;
         setPosition(x, y);
         setSpeed(1);
