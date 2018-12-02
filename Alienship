@@ -69,11 +69,11 @@ public class Alienship extends Participant implements AsteroidDestroyer, ShipDes
             }
             if (upDownOrCenter == 1)
             {
-                this.setDirection(57.2985);
+                this.setDirection(Math.PI / 4);
             }
             if (upDownOrCenter == 2)
             {
-                this.setDirection(-57.2985);
+                this.setDirection(-Math.PI / 4);
             }
         }
         else
@@ -84,11 +84,11 @@ public class Alienship extends Participant implements AsteroidDestroyer, ShipDes
             }
             if (upDownOrCenter == 1)
             {
-                this.setDirection(122.7042);
+                this.setDirection(3 * Math.PI / 4);
             }
             if (upDownOrCenter == 2)
             {
-                this.setDirection(-122.7042);
+                this.setDirection(-5 * Math.PI / 4);
             }
         }
         new ParticipantCountdownTimer(this, 1000);
@@ -160,9 +160,12 @@ public class Alienship extends Participant implements AsteroidDestroyer, ShipDes
         if (choice)
         {
             isMovingLeft = true;
-            this.setSpeed(4);
+            this.setSpeed(-4);
         }
-        this.setSpeed(-4);
+        else
+        {
+        this.setSpeed(4);
+        }
         return isMovingLeft;
     }
 
