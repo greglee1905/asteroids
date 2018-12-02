@@ -1,7 +1,10 @@
 package asteroids.participants;
 
+import static asteroids.game.Constants.RANDOM;
 import java.awt.Shape;
 import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
+import asteroids.destroyers.AlienShipDestroyer;
 import asteroids.destroyers.AsteroidDestroyer;
 import asteroids.destroyers.ShipDestroyer;
 import asteroids.game.Controller;
@@ -26,18 +29,18 @@ public class Alienship extends Participant implements AsteroidDestroyer, ShipDes
 
         Path2D.Double poly = new Path2D.Double();
         poly.moveTo(0, 0);
-        poly.lineTo(20, 0);
-        poly.lineTo(-20, 0);
-        poly.lineTo(-12, -10);
-        poly.lineTo(12, -10);
-        poly.lineTo(20, 0);
-        poly.lineTo(12, 10);
-        poly.lineTo(-12, 10);
-        poly.lineTo(-20, 0);
-        poly.moveTo(-12, -10);
-        poly.lineTo(-8, -20);
-        poly.lineTo(8, -20);
-        poly.lineTo(12, -10);
+        poly.lineTo(19, 0);
+        poly.lineTo(-19, 0);
+        poly.lineTo(-8, -8);
+        poly.lineTo(8, -8);
+        poly.lineTo(19, 0);
+        poly.lineTo(8, 8);
+        poly.lineTo(-8, 8);
+        poly.lineTo(-19, 0);
+        poly.moveTo(-8, -8);
+        poly.lineTo(-6, -16);
+        poly.lineTo(6, -16);
+        poly.lineTo(8, -8);
         poly.closePath();
         outline = poly;
 
@@ -48,12 +51,48 @@ public class Alienship extends Participant implements AsteroidDestroyer, ShipDes
     {
         return outline;
     }
+    
+    /**
+     * Returns the x-coordinate of the point on the screen where the alienship's center is located.
+     */
+    public double getXCenter ()
+    {
+        Point2D.Double point = new Point2D.Double(0, 0);
+        transformPoint(point);
+        return point.getX();
+    }
 
+    /**
+     * Returns the x-coordinate of the point on the screen where the alienship's center is located.
+     */
+    public double getYCenter ()
+    {
+        Point2D.Double point = new Point2D.Double(0, 0);
+        transformPoint(point);
+        return point.getY();
+    }
+
+    /**
+     * When an AlienShip collides with a ShipDestroyer, it expires
+     */
     @Override
     public void collidedWith (Participant p)
     {
-        // TODO Auto-generated method stub
-        
+        if (p instanceof AlienShipDestroyer)
+        {
+            
+            // Expire the alienship from the game
+            Participant.expire(this);  
+            
+            // Spawn four long ship dusts and 2 short ship dusts.
+            controller.placeShipDustLong(this.getX(),this.getY(), RANDOM.nextInt(8), controller);
+            controller.placeShipDustLong(this.getX(),this.getY(), RANDOM.nextInt(8), controller);
+            controller.placeShipDustLong(this.getX(),this.getY(), RANDOM.nextInt(8), controller);
+            controller.placeShipDustLong(this.getX(),this.getY(), RANDOM.nextInt(8), controller);
+            controller.placeShipDustShort(this.getX(),this.getY(), RANDOM.nextInt(8), controller);
+            controller.placeShipDustShort(this.getX(),this.getY(), RANDOM.nextInt(8), controller);
+            controller.setScore(200);
+        }
     }
 
 }
