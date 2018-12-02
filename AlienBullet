@@ -35,6 +35,28 @@ public class AlienBullet extends Bullet implements AsteroidDestroyer, ShipDestro
         this.move();
 
     }
+    
+    @Override
+    public void countdownComplete (Object payload)
+    {
+        Participant.expire(this);
+    }
+
+    @Override
+    protected Shape getOutline ()
+    {
+        return outline;
+    }
+    
+    /**
+     * Customizes the base move method by imposing friction
+     */
+    @Override
+    public void move ()
+    {
+        this.setSpeed(BULLET_SPEED);
+        super.move();
+    }
     /**
      * When a Bullet collides with a BulletDestroyer, it expires
      */
@@ -51,3 +73,4 @@ public class AlienBullet extends Bullet implements AsteroidDestroyer, ShipDestro
     }
 
 }
+
