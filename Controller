@@ -646,6 +646,26 @@ public class Controller implements KeyListener, ActionListener
             // It may be time to make a game transition
             performTransition();
             performTransitionalien();
+            
+                        if (alienShip != null)
+            {
+                bigSaucerClip.loop(bigSaucerClip.LOOP_CONTINUOUSLY);
+            }
+            
+            if (alienShip == null)
+            {
+                bigSaucerClip.stop();
+            }
+            
+            if (lilAlienShip != null)
+            {
+                smallSaucerClip.loop(smallSaucerClip.LOOP_CONTINUOUSLY);
+            }
+            
+            if (lilAlienShip == null )
+            {
+                smallSaucerClip.stop();
+            }
 
             // Move the participants to their new locations
             pstate.moveParticipants();
