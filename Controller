@@ -626,16 +626,21 @@ public class Controller implements KeyListener, ActionListener
             {
                 thrustClip.stop();
             }
+            
+            if (ship == null)
+            {
+                thrustClip.stop();
+            }
 
             if (isFiring && pstate.countBullets() < BULLET_LIMIT)
             {
-                placeBullet();
                 if (fireClip.isRunning())
                 {
                     fireClip.stop();
                 }
                 fireClip.setFramePosition(0);
                 fireClip.start();
+                placeBullet();               
             }
 
             // It may be time to make a game transition
@@ -676,8 +681,8 @@ public class Controller implements KeyListener, ActionListener
                 // Changing the level values
                 // THERE IS ALSO A BUG with if the ship collides into the last boulder on the screen
                 if (this.getLevel() == 2)
-                {
-                    alienShipDestroyed();
+                {   
+                    scheduleTransitionalien(RANDOM.nextInt(5000) + 5000);
                     placeShip();
                     placeAsteroids();
 
@@ -717,7 +722,8 @@ public class Controller implements KeyListener, ActionListener
                     // also need to expire bullets
                     placeShip();
                     placeAsteroids();
-                    lilalienShipDestroyed();
+                    scheduleTransitionalien(RANDOM.nextInt(5000) + 5000);
+                  
 
                     for (int i = 0; i < (level - 1); i++)
                     {
