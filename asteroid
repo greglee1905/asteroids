@@ -15,7 +15,7 @@ import asteroids.game.Participant;
  * Represents asteroids
  */
 // add implements ShipDestroyer
-public class Asteroid extends Participant implements ShipDestroyer, AlienShipDestroyer, BulletDestroyer, AlienBulletDestroyer
+public class Asteroid extends Participant implements  AlienShipDestroyer, BulletDestroyer, AlienBulletDestroyer
 {
     /** The size of the asteroid (0 = small, 1 = medium, 2 = large) */
     private int size;
@@ -165,6 +165,7 @@ public class Asteroid extends Participant implements ShipDestroyer, AlienShipDes
                     controller.placeDust(p.getX(),p.getY(), RANDOM.nextInt(8), controller);
                     controller.placeDust(p.getX(),p.getY(), RANDOM.nextInt(8), controller);
                     controller.placeDust(p.getX(),p.getY(), RANDOM.nextInt(8), controller);
+                    controller.largeAsteroidDestroyed();
                     
                 }
                 
@@ -177,6 +178,7 @@ public class Asteroid extends Participant implements ShipDestroyer, AlienShipDes
                     controller.placeDust(p.getX(),p.getY(), RANDOM.nextInt(8), controller);
                     controller.placeDust(p.getX(),p.getY(), RANDOM.nextInt(8), controller);
                     controller.placeDust(p.getX(),p.getY(), RANDOM.nextInt(8), controller);
+                    controller.mediumAsteroidDestroyed();
                 }
                 
                 if (this.getSize() ==0)
@@ -186,6 +188,7 @@ public class Asteroid extends Participant implements ShipDestroyer, AlienShipDes
                     controller.placeDust(p.getX(),p.getY(), RANDOM.nextInt(8), controller);
                     controller.placeDust(p.getX(),p.getY(), RANDOM.nextInt(8), controller);
                     controller.placeDust(p.getX(),p.getY(), RANDOM.nextInt(8), controller);
+                    controller.smallAsteroidDestroyed();
                 }
                 
                 
