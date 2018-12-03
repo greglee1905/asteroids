@@ -74,6 +74,11 @@ public class Controller implements KeyListener, ActionListener
      */
     private long transitionTimealien;
 
+    /**
+     * The transition time for the beat
+     */
+    private long transitionTimeBeat;
+    
     /** Number of lives left */
     private int lives;
 
@@ -129,6 +134,21 @@ public class Controller implements KeyListener, ActionListener
      * Is the AlienShip firing
      */
     private boolean lilAlienFiring;
+
+    /**
+     * Heart beat
+     */
+    private int currentHeartBeat;
+    
+    /**
+     * Is beat 1 or 2 going to play next?
+     */
+    private boolean isBeat2;
+    
+    /**
+     * Is the splash screen present
+     */
+    private boolean isSplashScreen;
 
     /**
      * 
@@ -252,6 +272,7 @@ public class Controller implements KeyListener, ActionListener
         display.setLegend("Asteroids");
         level = -100;
         score = -100;
+        isSplashScreen = true;
 
         // Place four asteroids near the corners of the screen.
         placeAsteroids();
@@ -276,6 +297,7 @@ public class Controller implements KeyListener, ActionListener
         ship = new Ship(SIZE / 2, SIZE / 2, -Math.PI / 2, this);
         addParticipant(ship);
         display.setLegend("");
+        currentHeartBeat = INITIAL_BEAT;
     }
 
     /**
@@ -451,6 +473,8 @@ public class Controller implements KeyListener, ActionListener
         // Place the ship
         placeShip();
 
+        currentHeartBeat = INITIAL_BEAT;
+        scheduleBeatTransition(INITIAL_BEAT);
         // USED FOR TESTING
         // lilalienShipDestroyed();
         // alienShipDestroyed();
@@ -489,6 +513,7 @@ public class Controller implements KeyListener, ActionListener
         }
         bangShipClip.setFramePosition(0);
         bangShipClip.start();
+        currentHeartBeat = END_DELAY;
         // Null out the ship
         ship = null;
 
@@ -578,6 +603,11 @@ public class Controller implements KeyListener, ActionListener
         transitionTimealien = System.currentTimeMillis() + m;
     }
 
+    private void scheduleBeatTransition (int m)
+    {
+        transitionTimeBeat = System.currentTimeMillis() + m;
+    }
+
     /**
      * This method will be invoked because of button presses and timer events.
      */
@@ -589,6 +619,7 @@ public class Controller implements KeyListener, ActionListener
         if (e.getSource() instanceof JButton)
         {
             initialScreen();
+            isSplashScreen = false;
         }
 
         // Time to refresh the screen and deal with keyboard input
@@ -626,7 +657,7 @@ public class Controller implements KeyListener, ActionListener
             {
                 thrustClip.stop();
             }
-            
+
             if (ship == null)
             {
                 thrustClip.stop();
@@ -640,29 +671,33 @@ public class Controller implements KeyListener, ActionListener
                 }
                 fireClip.setFramePosition(0);
                 fireClip.start();
-                placeBullet();               
+                placeBullet();
             }
 
             // It may be time to make a game transition
             performTransition();
             performTransitionalien();
-            
-                        if (alienShip != null)
+            if (isSplashScreen == false)
+            {
+            performBeatTransition();
+            }
+
+            if (alienShip != null)
             {
                 bigSaucerClip.loop(bigSaucerClip.LOOP_CONTINUOUSLY);
             }
-            
+
             if (alienShip == null)
             {
                 bigSaucerClip.stop();
             }
-            
+
             if (lilAlienShip != null)
             {
                 smallSaucerClip.loop(smallSaucerClip.LOOP_CONTINUOUSLY);
             }
-            
-            if (lilAlienShip == null )
+
+            if (lilAlienShip == null)
             {
                 smallSaucerClip.stop();
             }
@@ -697,11 +732,12 @@ public class Controller implements KeyListener, ActionListener
 
             if (lives > 0 && pstate.countAsteroids() == 0)
             {
+                currentHeartBeat = INITIAL_BEAT;
                 level += 1;
                 // Changing the level values
                 // THERE IS ALSO A BUG with if the ship collides into the last boulder on the screen
                 if (this.getLevel() == 2)
-                {   
+                {
                     scheduleTransitionalien(RANDOM.nextInt(5000) + 5000);
                     placeShip();
                     placeAsteroids();
@@ -735,6 +771,7 @@ public class Controller implements KeyListener, ActionListener
 
                 if (this.getLevel() >= 3)
                 {
+                    currentHeartBeat = INITIAL_BEAT;
                     Alienship.expire(alienShip);
                     Alienship.expire(lilAlienShip);
                     AlienBullet.expire(alienbullet);
@@ -743,7 +780,6 @@ public class Controller implements KeyListener, ActionListener
                     placeShip();
                     placeAsteroids();
                     scheduleTransitionalien(RANDOM.nextInt(5000) + 5000);
-                  
 
                     for (int i = 0; i < (level - 1); i++)
                     {
@@ -783,6 +819,7 @@ public class Controller implements KeyListener, ActionListener
             // screen.
             if (lives <= 0 && shipdeath == true)
             {
+                isSplashScreen = true;
                 finalScreen();
             }
 
@@ -817,6 +854,40 @@ public class Controller implements KeyListener, ActionListener
                 }
             }
         }
+    }
+
+    private void performBeatTransition ()
+    {
+        if (transitionTimeBeat <= System.currentTimeMillis() && !isSplashScreen)
+        {
+            transitionTimeBeat = Long.MAX_VALUE;
+            if (!isBeat2)
+            {
+                if (beat1Clip.isRunning())
+                {
+                    beat1Clip.stop();
+                }
+                beat1Clip.setFramePosition(0);
+                beat1Clip.start();
+                isBeat2 = true;
+            }
+            if (isBeat2)
+            {
+                if (beat2Clip.isRunning())
+                {
+                    beat2Clip.stop();
+                }
+                beat2Clip.setFramePosition(0);
+                beat2Clip.start();
+                isBeat2 = false;
+            }
+            if (currentHeartBeat > FASTEST_BEAT)
+            {
+                currentHeartBeat = currentHeartBeat - BEAT_DELTA;
+            }
+            scheduleBeatTransition(currentHeartBeat);
+        }
+
     }
 
     /**
