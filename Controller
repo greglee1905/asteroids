@@ -66,7 +66,7 @@ public class Controller implements KeyListener, ActionListener
      * resetting the current level.
      */
     private long transitionTime;
-    
+
     /**
      * The time at which a transition to a new stage of the game should be made. A transition is scheduled a few seconds
      * in the future to give the user time to see what has happened before doing something like going to a new level or
@@ -129,10 +129,8 @@ public class Controller implements KeyListener, ActionListener
      * Is the AlienShip firing
      */
     private boolean lilAlienFiring;
-    
-    
-    
-        /**
+
+    /**
      * 
      * 
      * SOUNDS
@@ -403,7 +401,7 @@ public class Controller implements KeyListener, ActionListener
      */
     private void placeAlienBullet ()
     {
-        addParticipant(new AlienBullet(alienShip.getX(), alienShip.getY(), RANDOM.nextInt(80)*0.1, this));
+        addParticipant(new AlienBullet(alienShip.getX(), alienShip.getY(), RANDOM.nextInt(80) * 0.1, this));
         this.setAlienFiring(false);
     }
 
@@ -454,9 +452,8 @@ public class Controller implements KeyListener, ActionListener
         placeShip();
 
         // USED FOR TESTING
-       // lilalienShipDestroyed();
-        //alienShipDestroyed();
-        
+        // lilalienShipDestroyed();
+        // alienShipDestroyed();
 
         // Reset statistics
         lives = 3;
@@ -468,7 +465,6 @@ public class Controller implements KeyListener, ActionListener
         // Display components on screen components
         level = 1;
         score = 0;
-        
 
         // Give focus to the game screen
         display.requestFocusInWindow();
@@ -487,6 +483,12 @@ public class Controller implements KeyListener, ActionListener
      */
     public void shipDestroyed ()
     {
+        if (bangShipClip.isRunning())
+        {
+            bangShipClip.stop();
+        }
+        bangShipClip.setFramePosition(0);
+        bangShipClip.start();
         // Null out the ship
         ship = null;
 
@@ -510,16 +512,28 @@ public class Controller implements KeyListener, ActionListener
 
     public void alienShipDestroyed ()
     {
+        if (bangAlienShipClip.isRunning())
+        {
+            bangAlienShipClip.stop();
+        }
+        bangAlienShipClip.setFramePosition(0);
+        bangAlienShipClip.start();
         alienShip = null;
-        scheduleTransitionalien(RANDOM.nextInt(5000)+5000);
-        
+        scheduleTransitionalien(RANDOM.nextInt(5000) + 5000);
+
     }
-    
+
     public void lilalienShipDestroyed ()
     {
+        if (bangAlienShipClip.isRunning())
+        {
+            bangAlienShipClip.stop();
+        }
+        bangAlienShipClip.setFramePosition(0);
+        bangAlienShipClip.start();
         lilAlienShip = null;
-        scheduleTransitionalien(RANDOM.nextInt(5000)+5000);
-        
+        scheduleTransitionalien(RANDOM.nextInt(5000) + 5000);
+
     }
 
     /**
@@ -555,7 +569,7 @@ public class Controller implements KeyListener, ActionListener
     {
         transitionTime = System.currentTimeMillis() + m;
     }
-    
+
     /**
      * Schedules a transition m msecs in the future
      */
@@ -563,7 +577,6 @@ public class Controller implements KeyListener, ActionListener
     {
         transitionTimealien = System.currentTimeMillis() + m;
     }
-
 
     /**
      * This method will be invoked because of button presses and timer events.
@@ -605,6 +618,13 @@ public class Controller implements KeyListener, ActionListener
             {
                 toggleFlickering();
                 ship.accelerate();
+
+                thrustClip.loop(thrustClip.LOOP_CONTINUOUSLY);
+            }
+
+            if (ship != null && !isAccelerating)
+            {
+                thrustClip.stop();
             }
 
             if (isFiring && pstate.countBullets() < BULLET_LIMIT)
@@ -649,89 +669,84 @@ public class Controller implements KeyListener, ActionListener
         {
             // Clear the transition time
             transitionTime = Long.MAX_VALUE;
-            
 
-            
-            if (lives>0 && pstate.countAsteroids()==0)
+            if (lives > 0 && pstate.countAsteroids() == 0)
             {
                 level += 1;
-            // Changing the level values
-            // THERE IS ALSO A BUG with if the ship collides into the last boulder on the screen
-            if (this.getLevel() == 2 )
-            {
-                alienShipDestroyed();
-                placeShip();
-                placeAsteroids();
-                
-
-                for (int i = 0; i < (level - 1); i++)
+                // Changing the level values
+                // THERE IS ALSO A BUG with if the ship collides into the last boulder on the screen
+                if (this.getLevel() == 2)
                 {
-                    // Placing one Additional Asteroids
-                    int placeholder = RANDOM.nextInt(3);
-                    if (placeholder == 0)
+                    alienShipDestroyed();
+                    placeShip();
+                    placeAsteroids();
+
+                    for (int i = 0; i < (level - 1); i++)
                     {
-                        addParticipant(new Asteroid(1, 2, EDGE_OFFSET + 500 - RANDOM.nextInt(100),
-                                EDGE_OFFSET - 50 + RANDOM.nextInt(100), 3, this));
+                        // Placing one Additional Asteroids
+                        int placeholder = RANDOM.nextInt(3);
+                        if (placeholder == 0)
+                        {
+                            addParticipant(new Asteroid(1, 2, EDGE_OFFSET + 500 - RANDOM.nextInt(100),
+                                    EDGE_OFFSET - 50 + RANDOM.nextInt(100), 3, this));
+                        }
+                        if (placeholder == 1)
+                        {
+                            addParticipant(new Asteroid(2, 2, EDGE_OFFSET - 50 + RANDOM.nextInt(100),
+                                    EDGE_OFFSET + 500 - RANDOM.nextInt(100), 3, this));
+                        }
+                        if (placeholder == 2)
+                        {
+                            addParticipant(new Asteroid(3, 2, EDGE_OFFSET + 500 - RANDOM.nextInt(100),
+                                    EDGE_OFFSET + 500 - RANDOM.nextInt(100), 3, this));
+                        }
+                        if (placeholder == 3)
+                        {
+                            addParticipant(new Asteroid(0, 2, EDGE_OFFSET - 50 + RANDOM.nextInt(100),
+                                    EDGE_OFFSET - 50 + RANDOM.nextInt(100), 3, this));
+                        }
                     }
-                    if (placeholder == 1)
+                }
+
+                if (this.getLevel() >= 3)
+                {
+                    Alienship.expire(alienShip);
+                    Alienship.expire(lilAlienShip);
+                    AlienBullet.expire(alienbullet);
+                    AlienBullet.expire(lilAlienBullet);
+                    // also need to expire bullets
+                    placeShip();
+                    placeAsteroids();
+                    lilalienShipDestroyed();
+
+                    for (int i = 0; i < (level - 1); i++)
                     {
-                        addParticipant(new Asteroid(2, 2, EDGE_OFFSET - 50 + RANDOM.nextInt(100),
-                                EDGE_OFFSET + 500 - RANDOM.nextInt(100), 3, this));
-                    }
-                    if (placeholder == 2)
-                    {
-                        addParticipant(new Asteroid(3, 2, EDGE_OFFSET + 500 - RANDOM.nextInt(100),
-                                EDGE_OFFSET + 500 - RANDOM.nextInt(100), 3, this));
-                    }
-                    if (placeholder == 3)
-                    {
-                        addParticipant(new Asteroid(0, 2, EDGE_OFFSET - 50 + RANDOM.nextInt(100),
-                                EDGE_OFFSET - 50 + RANDOM.nextInt(100), 3, this));
+                        // Placing one Additional Asteroids
+                        int placeholder = RANDOM.nextInt(3);
+                        if (placeholder == 0)
+                        {
+                            addParticipant(new Asteroid(1, 2, EDGE_OFFSET + 500 - RANDOM.nextInt(100),
+                                    EDGE_OFFSET - 50 + RANDOM.nextInt(100), 3, this));
+                        }
+                        if (placeholder == 1)
+                        {
+                            addParticipant(new Asteroid(2, 2, EDGE_OFFSET - 50 + RANDOM.nextInt(100),
+                                    EDGE_OFFSET + 500 - RANDOM.nextInt(100), 3, this));
+                        }
+                        if (placeholder == 2)
+                        {
+                            addParticipant(new Asteroid(3, 2, EDGE_OFFSET + 500 - RANDOM.nextInt(100),
+                                    EDGE_OFFSET + 500 - RANDOM.nextInt(100), 3, this));
+                        }
+                        if (placeholder == 3)
+                        {
+                            addParticipant(new Asteroid(0, 2, EDGE_OFFSET - 50 + RANDOM.nextInt(100),
+                                    EDGE_OFFSET - 50 + RANDOM.nextInt(100), 3, this));
+                        }
                     }
                 }
             }
 
-            if (this.getLevel() >= 3 )
-            {
-                Alienship.expire(alienShip);
-                Alienship.expire(lilAlienShip);
-                AlienBullet.expire(alienbullet);
-                AlienBullet.expire(lilAlienBullet);
-                //also need to expire bullets
-                placeShip();
-                placeAsteroids();
-                lilalienShipDestroyed();
-                
-               
-
-                for (int i = 0; i < (level - 1); i++)
-                {
-                    // Placing one Additional Asteroids
-                    int placeholder = RANDOM.nextInt(3);
-                    if (placeholder == 0)
-                    {
-                        addParticipant(new Asteroid(1, 2, EDGE_OFFSET + 500 - RANDOM.nextInt(100),
-                                EDGE_OFFSET - 50 + RANDOM.nextInt(100), 3, this));
-                    }
-                    if (placeholder == 1)
-                    {
-                        addParticipant(new Asteroid(2, 2, EDGE_OFFSET - 50 + RANDOM.nextInt(100),
-                                EDGE_OFFSET + 500 - RANDOM.nextInt(100), 3, this));
-                    }
-                    if (placeholder == 2)
-                    {
-                        addParticipant(new Asteroid(3, 2, EDGE_OFFSET + 500 - RANDOM.nextInt(100),
-                                EDGE_OFFSET + 500 - RANDOM.nextInt(100), 3, this));
-                    }
-                    if (placeholder == 3)
-                    {
-                        addParticipant(new Asteroid(0, 2, EDGE_OFFSET - 50 + RANDOM.nextInt(100),
-                                EDGE_OFFSET - 50 + RANDOM.nextInt(100), 3, this));
-                    }
-                }
-            }
-            }
-            
             if (lives > 0 && shipdeath == true)
             {
                 placeShip();
@@ -747,7 +762,7 @@ public class Controller implements KeyListener, ActionListener
 
         }
     }
-    
+
     /**
      * If the transition time has been reached, transition to a new state
      */
@@ -758,17 +773,17 @@ public class Controller implements KeyListener, ActionListener
         {
             // Clear the transition time
             transitionTimealien = Long.MAX_VALUE;
-            
+
             // Place Alienships if one has been destroyed
-            if (this.getLevel()==2)
+            if (this.getLevel() == 2)
             {
                 if (alienShip == null)
                 {
                     placeAlienship();
                 }
             }
-        
-            if (this.getLevel()>2)
+
+            if (this.getLevel() > 2)
             {
                 if (lilAlienShip == null)
                 {
@@ -932,7 +947,8 @@ public class Controller implements KeyListener, ActionListener
         lilAlienFiring = alienFire;
         return lilAlienFiring;
     }
-        /**
+
+    /**
      * Creates an audio clip from a sound file.
      */
     public Clip createClip (String soundFile)
@@ -962,4 +978,37 @@ public class Controller implements KeyListener, ActionListener
             return null;
         }
     }
+
+    /**
+     * calls to make the asteroid blowing up sound for LARGE asteroids
+     */
+    public void largeAsteroidDestroyed ()
+    {
+        bangLargeClip.stop();
+        bangLargeClip.setMicrosecondPosition(0);
+        bangLargeClip.start();
+
+    }
+
+    /**
+     * calls to make the asteroid blowing up sound for LARGE asteroids
+     */
+    public void mediumAsteroidDestroyed ()
+    {
+        bangMediumClip.start();
+        bangMediumClip.setMicrosecondPosition(0);
+        bangMediumClip.start();
+    }
+
+    /**
+     * calls to make the asteroid blowing up sound for LARGE asteroids
+     */
+    public void smallAsteroidDestroyed ()
+    {
+        bangSmallClip.start();
+        bangSmallClip.start();
+        bangSmallClip.setMicrosecondPosition(0);
+        bangSmallClip.start();
+    }
+
 }
